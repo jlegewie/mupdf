@@ -52,3 +52,11 @@ platform/win32/Release
 platform/win32/ReleaseOpenssl
 platform/win32/Memento
 platform/win32/x64
+
+# Local test and benchmark files
+FORK.html
+FORK_FILES/**
+
+# Local fork regression corpus
+/fork-regressions/data/*
+!/fork-regressions/data/.gitkeep
