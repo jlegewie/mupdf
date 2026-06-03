@@ -173,6 +173,7 @@ const char *fz_stext_options_usage =
 	"\tignore-actualtext: do not apply ActualText replacements\n"
 	"\tuse-cid-for-unknown-unicode: use character code if unicode mapping fails\n"
 	"\tuse-gid-for-unknown-unicode: use glyph index if unicode mapping fails\n"
+	"\tuse-glyph-name-for-unknown-unicode: decode numeric \"C<n>\" glyph names if unicode mapping fails\n"
 	"\taccurate-bboxes: calculate char bboxes from the outlines\n"
 	"\taccurate-ascenders: calculate ascender/descender from font glyphs\n"
 	"\taccurate-side-bearings: expand char bboxes to completely include width of glyphs\n"
@@ -1148,7 +1149,18 @@ do_extract(fz_context *ctx, fz_stext_device *dev, fz_text_span *span, fz_matrix 
 		unicode = span->items[i].ucs;
 		if (unicode == FZ_REPLACEMENT_CHARACTER)
 		{
-			if (dev->flags & FZ_STEXT_USE_CID_FOR_UNKNOWN_UNICODE)
+			int named = FZ_REPLACEMENT_CHARACTER;
+			if ((dev->flags & FZ_STEXT_USE_GLYPH_NAME_FOR_UNKNOWN_UNICODE) && span->items[i].gid >= 0)
+			{
+				char gname[64];
+				fz_get_glyph_name(ctx, font, span->items[i].gid, gname, sizeof gname);
+				named = fz_unicode_from_numeric_glyph_name(gname);
+			}
+			if (named != FZ_REPLACEMENT_CHARACTER)
+			{
+				unicode = named;
+			}
+			else if (dev->flags & FZ_STEXT_USE_CID_FOR_UNKNOWN_UNICODE)
 			{
 				unicode = span->items[i].cid;
 				flags |= FZ_STEXT_UNICODE_IS_CID;
@@ -2078,6 +2090,8 @@ fz_parse_stext_options(fz_context *ctx, fz_stext_options *opts, const char *stri
 		opts->flags |= FZ_STEXT_USE_CID_FOR_UNKNOWN_UNICODE;
 	if (fz_has_option(ctx, string, "use-gid-for-unknown-unicode", &val) && fz_option_eq(val, "yes"))
 		opts->flags |= FZ_STEXT_USE_GID_FOR_UNKNOWN_UNICODE;
+	if (fz_has_option(ctx, string, "use-glyph-name-for-unknown-unicode", &val) && fz_option_eq(val, "yes"))
+		opts->flags |= FZ_STEXT_USE_GLYPH_NAME_FOR_UNKNOWN_UNICODE;
 	if (fz_has_option(ctx, string, "accurate-bboxes", &val) && fz_option_eq(val, "yes"))
 		opts->flags |= FZ_STEXT_ACCURATE_BBOXES;
 	if (fz_has_option(ctx, string, "vectors", &val) && fz_option_eq(val, "yes"))
