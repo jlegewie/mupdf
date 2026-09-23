@@ -78,3 +78,73 @@ print("OK: glyph-name recovery off=U+FFFD on=recovered");
 JS
 	"$MUTOOL" run "$script" "$GLYPH_SAMPLE"
 fi
+
+# Content assertion for the `use-known-glyph-outlines` option: a symbol font
+# whose glyph "m" draws a mu (Elsevier Advent font, no ToUnicode). OFF must keep
+# upstream output; ON must recover the mu and leave ordinary Latin text alone.
+OUTLINE_SAMPLE="$CORPUS_DIR/known-glyph-outlines/sample.pdf"
+if [[ -f "$OUTLINE_SAMPLE" ]]; then
+	printf '==> known-glyph-outline assertion (%s)\n' "${OUTLINE_SAMPLE#"$ROOT"/}"
+	script="$(mktemp -t knownoutline.XXXXXX.js)"
+	trap 'rm -f "$script"' EXIT
+	cat > "$script" <<'JS'
+var page = Document.openDocument(scriptArgs[0]).loadPage(0);
+var off = page.toStructuredText("preserve-whitespace").asText();
+var on = page.toStructuredText("preserve-whitespace,use-known-glyph-outlines").asText();
+if (off.indexOf("20 mg of NP-Ova") < 0)
+	throw new Error("FAIL: option OFF should keep upstream output (20 mg)");
+if (on.indexOf("20 μg of NP-Ova") < 0)
+	throw new Error("FAIL: option ON should recover the mu (20 μg)");
+if (on.indexOf("footpad-immunized") < 0 || on.length != off.length)
+	throw new Error("FAIL: option ON should leave ordinary text unchanged");
+print("OK: known-glyph-outline off=upstream on=recovered");
+JS
+	"$MUTOOL" run "$script" "$OUTLINE_SAMPLE"
+fi
+
+# Same option, font WITH a broken ToUnicode CMap: Elsevier's ToUnicode maps its
+# "=" to "¼". ON must replace that implausible value; OFF keeps upstream output.
+TU_SAMPLE="$CORPUS_DIR/known-glyph-outlines/tounicode-sample.pdf"
+if [[ -f "$TU_SAMPLE" ]]; then
+	printf '==> known-glyph-outline ToUnicode assertion (%s)\n' "${TU_SAMPLE#"$ROOT"/}"
+	script="$(mktemp -t knownoutlinetu.XXXXXX.js)"
+	trap 'rm -f "$script"' EXIT
+	cat > "$script" <<'JS'
+var page = Document.openDocument(scriptArgs[0]).loadPage(0);
+var off = page.toStructuredText("preserve-whitespace").asText();
+var on = page.toStructuredText("preserve-whitespace,use-known-glyph-outlines").asText();
+if (off.indexOf("Nc ¼ N") < 0)
+	throw new Error("FAIL: option OFF should keep the ToUnicode value (Nc ¼ N)");
+if (on.indexOf("Nc = N −Nt") < 0)
+	throw new Error("FAIL: option ON should replace the broken ToUnicode value (Nc = N −Nt)");
+if (on.indexOf("¼") >= 0)
+	throw new Error("FAIL: option ON should leave no ¼ for the equals outline");
+print("OK: known-glyph-outline ToUnicode off=upstream on=recovered");
+JS
+	"$MUTOOL" run "$script" "$TU_SAMPLE"
+fi
+
+# Same option inside marked content: explicit /ActualText wins. Text that
+# ActualText confirms (exact match, or a matching prefix/suffix) must not be
+# rewritten by the outline heuristic; text outside ActualText still is.
+AT_SAMPLE="$CORPUS_DIR/known-glyph-outlines/actualtext-sample.pdf"
+if [[ -f "$AT_SAMPLE" ]]; then
+	printf '==> known-glyph-outline ActualText assertion (%s)\n' "${AT_SAMPLE#"$ROOT"/}"
+	script="$(mktemp -t knownoutlineat.XXXXXX.js)"
+	trap 'rm -f "$script"' EXIT
+	cat > "$script" <<'JS'
+var page = Document.openDocument(scriptArgs[0]).loadPage(0);
+function chars(o) { return page.toStructuredText(o).asText().replace(/\s+/g, ""); }
+var off = chars("preserve-whitespace");
+var on = chars("preserve-whitespace,use-known-glyph-outlines");
+var ign = chars("preserve-whitespace,use-known-glyph-outlines,ignore-actualtext");
+if (off != "mmm")
+	throw new Error("FAIL: option OFF should give mmm, got " + off);
+if (on != "mmμ")
+	throw new Error("FAIL: option ON must keep ActualText-confirmed m and recover only the plain one, got " + on);
+if (ign != "μμμ")
+	throw new Error("FAIL: with ignore-actualtext every glyph should be recovered, got " + ign);
+print("OK: known-glyph-outline respects ActualText");
+JS
+	"$MUTOOL" run "$script" "$AT_SAMPLE"
+fi

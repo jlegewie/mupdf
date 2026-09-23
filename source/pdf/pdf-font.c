@@ -1048,6 +1048,17 @@ pdf_load_simple_font(fz_context *ctx, pdf_document *doc, pdf_obj *dict, pdf_obj 
 			fz_warn(ctx, "cannot load ToUnicode CMap");
 		}
 
+		/* Mark embedded simple fonts as eligible for known-outline recovery,
+		 * recording whether their unicode comes from glyph names (which
+		 * symbol fonts often get wrong) or from a ToUnicode CMap. */
+		if (fontdesc->is_embedded)
+		{
+			if (fontdesc->to_unicode)
+				fontdesc->font->flags.unicode_from_tounicode = 1;
+			else if (fontdesc->cid_to_ucs)
+				fontdesc->font->flags.unicode_from_glyph_names = 1;
+		}
+
 	skip_encoding:
 
 		/* Widths */

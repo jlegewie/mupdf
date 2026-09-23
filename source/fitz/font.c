@@ -246,6 +246,7 @@ fz_drop_font(fz_context *ctx, fz_font *font)
 			fz_free(ctx, font->advance_cache[i]);
 		fz_free(ctx, font->advance_cache);
 	}
+	fz_free(ctx, font->known_outline_ucs);
 	if (font->shaper_data.destroy && font->shaper_data.shaper_handle)
 	{
 		font->shaper_data.destroy(ctx, font->shaper_data.shaper_handle);

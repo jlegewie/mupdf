@@ -198,6 +198,14 @@ typedef struct fz_stext_grid_positions fz_stext_grid_positions;
 	guess and may produce wrong-but-plausible characters for fonts that use
 	"C<n>" as a glyph-index name; it is checked before the CID/GID fallback.
 
+	FZ_STEXT_USE_KNOWN_GLYPH_OUTLINES: If this option is set, then for
+	embedded simple fonts, a glyph whose outline is in the table of known
+	glyph outlines is given the character the outline draws. This repairs
+	symbol fonts that draw Greek letters or math symbols in slots named for
+	Latin letters or punctuation. Without a ToUnicode CMap the table always
+	wins; with one, it only replaces values that cannot be right (see
+	fz_known_glyph_outline_override).
+
 */
 enum
 {
@@ -224,6 +232,7 @@ enum
 	FZ_STEXT_LAZY_VECTORS = (1<<20),
 	FZ_STEXT_FUZZY_VECTORS = (1<<21),
 	FZ_STEXT_USE_GLYPH_NAME_FOR_UNKNOWN_UNICODE = (1<<22),
+	FZ_STEXT_USE_KNOWN_GLYPH_OUTLINES = (1<<23),
 
 	/* An old, deprecated option. */
 	FZ_STEXT_MEDIABOX_CLIP = FZ_STEXT_CLIP

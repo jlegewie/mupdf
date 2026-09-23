@@ -702,6 +702,9 @@
     <ClCompile Include="..\..\source\fitz\json.c">
       <Filter>fitz</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\fitz\known-glyph-outlines.c">
+      <Filter>fitz</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\source\pdf\pdf-label.c">
       <Filter>pdf</Filter>
     </ClCompile>
@@ -738,6 +741,9 @@
       <Filter>fitz</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\fitz\jmemcust.h">
+      <Filter>fitz</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\fitz\known-glyph-outlines-table.h">
       <Filter>fitz</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\fitz\paint-glyph.h">

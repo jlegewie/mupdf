@@ -14,6 +14,7 @@ The `fork` branch is based on the upstream tag **1.27.2** and contains a small s
 | `source/pdf/pdf-repair.c` | (1) Bound the `endstream` scan so a corrupt stream with a missing terminator cannot swallow the objects that follow it; (2) rewind and resync — instead of aborting or skipping ahead — when a runaway dictionary/array parse consumes objects past its boundary |
 | `source/pdf/pdf-page.c` | Tolerate dangling/non-page kids in the page tree, and rebuild the page map if a mid-walk repair drops it, so a truncated PDF still yields the pages it does have |
 | `source/pdf/pdf-type3.c`, `source/fitz/font.c`, `include/mupdf/fitz/glyph-cache.h` | Deduplicate Type 3 `CharProcs`: load each distinct glyph stream once and share its display list across the many character codes an `/Encoding` maps onto it |
+| `source/fitz/known-glyph-outlines.c`, `source/fitz/known-glyph-outlines-table.h`, `source/fitz/stext-device.c`, `source/pdf/pdf-font.c`, `source/fitz/font.c`, `include/mupdf/fitz/font.h`, `include/mupdf/fitz/structured-text.h`, `platform/win32/libmupdf.vcxproj{,.filters}` | New `use-known-glyph-outlines` stext option (`FZ_STEXT_USE_KNOWN_GLYPH_OUTLINES`): for embedded simple fonts, a glyph whose outline hash is in a reviewed table gets the character the outline actually draws (always without a ToUnicode CMap; with one, only when the ToUnicode value cannot be right) |
 | `FORK.md` | This file |
 
 ## Why the glyph-name option exists
@@ -48,6 +49,81 @@ mutool run /tmp/check.js sample.pdf
 
 The first line is `U+FFFD` runs; the second is readable English. The fork
 regression runner (`make fork-regression-test`) asserts this automatically.
+
+## Why the known-glyph-outlines option exists
+
+Many embedded symbol fonts in academic PDFs have no ToUnicode CMap and name
+their glyphs after the Latin slot they occupy instead of the symbol they draw.
+Elsevier's "Advent" fonts draw μ in the glyph named `m` (`20 μg` extracts as
+`20 mg`); MathPi-style fonts draw − or × in glyphs named `C0`/`C2`; TeX math
+italic draws a period in the `colon` slot (`b = 0.32` extracts as `b¼0:32`).
+Every step of the code → glyph name → unicode chain is valid, so neither
+MuPDF nor any downstream check can tell the text is wrong, and recovery that
+only fires on U+FFFD never sees it. Poppler and PDF.js produce the same wrong
+text.
+
+The only reliable evidence is the glyph outline itself. The option hashes the
+outline of each glyph in font units (FreeType `FT_LOAD_NO_SCALE`; the exact
+definition is in `known-glyph-outlines.c`) and looks it up in
+`known-glyph-outlines-table.h`, which maps outline hashes to the character
+drawn:
+
+- The key is the outline, not the font name. Identical outlines are identical
+  drawings, so the table covers renamed subsets and font-name variants, and a
+  font name reused for different glyphs cannot trigger a false remap.
+- Only embedded simple fonts are eligible; `pdf_load_simple_font` records
+  whether their unicode comes from glyph names
+  (`fz_font_flags_t.unicode_from_glyph_names`) or from a ToUnicode CMap
+  (`unicode_from_tounicode`). The policy lives in
+  `fz_known_glyph_outline_override`:
+  - Without a ToUnicode CMap the table always wins; where the current
+    character already matches it the override is a no-op.
+  - With a ToUnicode CMap the table only replaces values that cannot be
+    right: U+FFFD or a control character, or a Latin-1 letter or vulgar
+    fraction when the table says the outline is not a letter. This targets
+    broken producer CMaps (Elsevier's ToUnicode maps its Computer Modern
+    `( ) = + [ ]` outlines to `ð Þ ¼ þ ½` and `\x8a`) and never overrides a
+    plausible ToUnicode value, e.g. `µ` vs `μ` or ASCII punctuation.
+  - Upstream MuPDF already drops ToUnicode values that are C0/C1 control
+    characters (`pdf-op-run.c`) and falls back to the glyph-name mapping;
+    those glyphs typically arrive here as U+FFFD.
+- Explicit `/ActualText` wins. Text inside marked content that the stext
+  device has matched against ActualText (an exact match, or the matching
+  prefix/suffix `do_extract_within_actualtext` sends through `do_extract`)
+  is never rewritten; with `ignore-actualtext` the recovery applies as usual.
+- Hashes are computed lazily per glyph and cached on the `fz_font`
+  (`known_outline_ucs`); overhead is not measurable on extraction benchmarks.
+- The table is generated from a corpus scan (real per-glyph extraction output
+  plus a render-and-match classifier), then reviewed by hand. Ambiguous
+  drawings (hyphen/minus/en dash, l/I, O/0, spacing accents vs quotes),
+  extensible TeX delimiter pieces and small-caps glyphs are left out.
+
+The option is off by default, like the other recovery options. Verify with
+`mutool run`:
+
+```sh
+cat > /tmp/check.js <<'JS'
+var p = Document.openDocument(scriptArgs[0]).loadPage(0);
+print(p.toStructuredText("preserve-whitespace").asText().match(/20 .g of NP-Ova/)[0]);
+print(p.toStructuredText("preserve-whitespace,use-known-glyph-outlines").asText().match(/20 .g of NP-Ova/)[0]);
+JS
+mutool run /tmp/check.js sample.pdf   # 20 mg of NP-Ova / 20 μg of NP-Ova
+```
+
+`make fork-regression-test` asserts this on
+`fork-regressions/data/known-glyph-outlines/sample.pdf` (no ToUnicode: `20 mg`
+→ `20 μg`), `tounicode-sample.pdf` (broken ToUnicode: `Nc ¼ N` →
+`Nc = N −Nt`) and `actualtext-sample.pdf` (ActualText-confirmed `m` stays `m`).
+
+No upstream MuPDF mechanism covers this (checked against 1.27.2 and upstream
+`master` as of 2026-09-23): the glyph-name heuristics (`C<n>` here, `gXXXX` and
+`Gxx` upstream) only apply to names that are otherwise unknown, the
+`Symbol`/`ZapfDingbats` handling only affects substitution of non-embedded
+fonts, and nothing compares glyph outlines with their mapped characters.
+
+Note: MuPDF's word-gap heuristic (`may_add_space` in `stext-device.c`) never
+inserts a synthesized space after characters above U+20CF, so a recovered
+`≥`, `−` or `○` may lose a following space that the misread Latin letter had.
 
 ## WASM Form XObject nesting guard
 

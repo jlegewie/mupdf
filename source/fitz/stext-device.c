@@ -174,6 +174,7 @@ const char *fz_stext_options_usage =
 	"\tuse-cid-for-unknown-unicode: use character code if unicode mapping fails\n"
 	"\tuse-gid-for-unknown-unicode: use glyph index if unicode mapping fails\n"
 	"\tuse-glyph-name-for-unknown-unicode: decode numeric \"C<n>\" glyph names if unicode mapping fails\n"
+	"\tuse-known-glyph-outlines: replace wrong unicode with the character a known symbol outline draws\n"
 	"\taccurate-bboxes: calculate char bboxes from the outlines\n"
 	"\taccurate-ascenders: calculate ascender/descender from font glyphs\n"
 	"\taccurate-side-bearings: expand char bboxes to completely include width of glyphs\n"
@@ -1104,8 +1105,10 @@ current_clip(fz_context *ctx, fz_stext_device *dev)
 	return r;
 }
 
+/* confirmed: the span's unicode was already matched against explicit
+ * ActualText, so no heuristic may change it. */
 static void
-do_extract(fz_context *ctx, fz_stext_device *dev, fz_text_span *span, fz_matrix ctm, int start, int end, int flags)
+do_extract(fz_context *ctx, fz_stext_device *dev, fz_text_span *span, fz_matrix ctm, int start, int end, int flags, int confirmed)
 {
 	fz_font *font = span->font;
 	fz_matrix tm = span->trm;
@@ -1147,6 +1150,8 @@ do_extract(fz_context *ctx, fz_stext_device *dev, fz_text_span *span, fz_matrix 
 			adv = 0;
 
 		unicode = span->items[i].ucs;
+		if ((dev->flags & FZ_STEXT_USE_KNOWN_GLYPH_OUTLINES) && !confirmed)
+			unicode = fz_known_glyph_outline_override(ctx, font, span->items[i].gid, unicode);
 		if (unicode == FZ_REPLACEMENT_CHARACTER)
 		{
 			int named = FZ_REPLACEMENT_CHARACTER;
@@ -1295,7 +1300,7 @@ do_extract_within_actualtext(fz_context *ctx, fz_stext_device *dev, fz_text_span
 		actualtext += len; z--;
 	}
 	if (start != 0)
-		do_extract(ctx, dev, span, ctm, 0, start, flags);
+		do_extract(ctx, dev, span, ctm, 0, start, flags, 1);
 
 	if (start == span->len)
 	{
@@ -1398,7 +1403,7 @@ do_extract_within_actualtext(fz_context *ctx, fz_stext_device *dev, fz_text_span
 
 	/* Send the postfix */
 	if (end != span->len)
-		do_extract(ctx, dev, span, ctm, end, span->len, flags);
+		do_extract(ctx, dev, span, ctm, end, span->len, flags, 1);
 
 	mt->text[0] = 0;
 }
@@ -1419,7 +1424,7 @@ fz_stext_extract(fz_context *ctx, fz_stext_device *dev, fz_text_span *span, fz_m
 	if (mt)
 		do_extract_within_actualtext(ctx, dev, span, ctm, mt, flags);
 	else
-		do_extract(ctx, dev, span, ctm, 0, span->len, flags);
+		do_extract(ctx, dev, span, ctm, 0, span->len, flags, 0);
 }
 
 static uint32_t hexrgba_from_color(fz_context *ctx, fz_colorspace *colorspace, const float *color, float alpha)
@@ -2092,6 +2097,8 @@ fz_parse_stext_options(fz_context *ctx, fz_stext_options *opts, const char *stri
 		opts->flags |= FZ_STEXT_USE_GID_FOR_UNKNOWN_UNICODE;
 	if (fz_has_option(ctx, string, "use-glyph-name-for-unknown-unicode", &val) && fz_option_eq(val, "yes"))
 		opts->flags |= FZ_STEXT_USE_GLYPH_NAME_FOR_UNKNOWN_UNICODE;
+	if (fz_has_option(ctx, string, "use-known-glyph-outlines", &val) && fz_option_eq(val, "yes"))
+		opts->flags |= FZ_STEXT_USE_KNOWN_GLYPH_OUTLINES;
 	if (fz_has_option(ctx, string, "accurate-bboxes", &val) && fz_option_eq(val, "yes"))
 		opts->flags |= FZ_STEXT_ACCURATE_BBOXES;
 	if (fz_has_option(ctx, string, "vectors", &val) && fz_option_eq(val, "yes"))

@@ -161,6 +161,12 @@ typedef struct
 
 	unsigned int embed : 1;
 	unsigned int never_embed : 1;
+
+	/* Set by the PDF loader for embedded simple fonts, recording where
+	 * their unicode values come from. Only such fonts are eligible for
+	 * known-outline recovery (see fz_known_glyph_outline_override). */
+	unsigned int unicode_from_glyph_names : 1; /* no ToUnicode CMap */
+	unsigned int unicode_from_tounicode : 1; /* has a ToUnicode CMap */
 } fz_font_flags_t;
 
 /**
@@ -815,6 +821,9 @@ struct fz_font
 	/* cached glyph metrics */
 	float **advance_cache;
 
+	/* cached known-outline unicode per glyph (see fz_known_glyph_outline_unicode) */
+	int *known_outline_ucs;
+
 	/* cached encoding lookup */
 	uint16_t *encoding_cache[256];
 
@@ -825,6 +834,39 @@ struct fz_font
 	/* Which font to use in a collection. */
 	int subfont;
 };
+
+/**
+	Look up a glyph's outline in the table of known glyph outlines.
+
+	Some fonts draw a symbol in a slot whose glyph name says otherwise (an
+	Elsevier Advent font whose glyph "m" draws a mu, a TeX font whose "colon"
+	draws a period). The table maps the hash of such an outline to the
+	character it actually draws. The outline is hashed in font units, so the
+	match is independent of font name, subsetting and encoding.
+
+	Returns the unicode value for the glyph, or 0 if the font has no outline
+	for it or the outline is not in the table. Results are cached per glyph.
+*/
+int fz_known_glyph_outline_unicode(fz_context *ctx, fz_font *font, int gid);
+
+/**
+	Decide the character to extract for a glyph, given the character the
+	font's mapping produced (current).
+
+	For an embedded simple font without a ToUnicode CMap, a glyph whose
+	outline is in the known-outline table always takes the table's
+	character: the mapping came from glyph names, which symbol fonts get
+	wrong.
+
+	For an embedded simple font with a ToUnicode CMap, the table only
+	overrides values that cannot be right: U+FFFD or a control character,
+	or a Latin-1 letter or vulgar fraction (U+00A0-U+00FF) where the table
+	says the outline is not a letter (Elsevier's ToUnicode maps its "(" to
+	"ð" and "=" to "¼").
+
+	Returns the character to use; current if there is no override.
+*/
+int fz_known_glyph_outline_override(fz_context *ctx, fz_font *font, int gid, int current);
 
 void fz_ft_lock(fz_context *ctx);
 
