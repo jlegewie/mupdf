@@ -217,6 +217,8 @@ is_distinct_greek(int c)
 	case 0x3F0: case 0x3F1: case 0x3F2: case 0x3F3: /* ϰ ϱ ϲ ϳ */
 		return 0;
 	}
+	if (c == 0xB5) /* micro sign: the table stores mu as U+03BC, but accept both */
+		return 1;
 	return (c >= 0x391 && c <= 0x3A9) || (c >= 0x3B1 && c <= 0x3C9) || (c >= 0x3D0 && c <= 0x3F5);
 }
 

@@ -5,6 +5,10 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CORPUS_DIR="${1:-$ROOT/fork-regressions/data}"
 MUTOOL="${MUTOOL:-$ROOT/build/debug/mutool}"
 
+# Temporary JS files written by the content assertions below, removed on exit.
+tmp_scripts=()
+trap 'rm -f ${tmp_scripts[@]+"${tmp_scripts[@]}"}' EXIT
+
 if [[ ! -x "$MUTOOL" ]]; then
 	printf 'error: mutool not found or not executable: %s\n' "$MUTOOL" >&2
 	printf 'hint: run `make build=debug build/debug/mutool`, or set MUTOOL=/path/to/mutool\n' >&2
@@ -61,7 +65,7 @@ GLYPH_SAMPLE="$CORPUS_DIR/distiller-c-glyphs/sample.pdf"
 if [[ -f "$GLYPH_SAMPLE" ]]; then
 	printf '==> glyph-name recovery assertion (%s)\n' "${GLYPH_SAMPLE#"$ROOT"/}"
 	script="$(mktemp -t glyphname.XXXXXX.js)"
-	trap 'rm -f "$script"' EXIT
+	tmp_scripts+=("$script")
 	cat > "$script" <<'JS'
 var path = scriptArgs[0];
 var page = Document.openDocument(path).loadPage(0);
@@ -86,7 +90,7 @@ OUTLINE_SAMPLE="$CORPUS_DIR/known-glyph-outlines/sample.pdf"
 if [[ -f "$OUTLINE_SAMPLE" ]]; then
 	printf '==> known-glyph-outline assertion (%s)\n' "${OUTLINE_SAMPLE#"$ROOT"/}"
 	script="$(mktemp -t knownoutline.XXXXXX.js)"
-	trap 'rm -f "$script"' EXIT
+	tmp_scripts+=("$script")
 	cat > "$script" <<'JS'
 var page = Document.openDocument(scriptArgs[0]).loadPage(0);
 var off = page.toStructuredText("preserve-whitespace").asText();
@@ -108,7 +112,7 @@ TU_SAMPLE="$CORPUS_DIR/known-glyph-outlines/tounicode-sample.pdf"
 if [[ -f "$TU_SAMPLE" ]]; then
 	printf '==> known-glyph-outline ToUnicode assertion (%s)\n' "${TU_SAMPLE#"$ROOT"/}"
 	script="$(mktemp -t knownoutlinetu.XXXXXX.js)"
-	trap 'rm -f "$script"' EXIT
+	tmp_scripts+=("$script")
 	cat > "$script" <<'JS'
 var page = Document.openDocument(scriptArgs[0]).loadPage(0);
 var off = page.toStructuredText("preserve-whitespace").asText();
@@ -131,7 +135,7 @@ AT_SAMPLE="$CORPUS_DIR/known-glyph-outlines/actualtext-sample.pdf"
 if [[ -f "$AT_SAMPLE" ]]; then
 	printf '==> known-glyph-outline ActualText assertion (%s)\n' "${AT_SAMPLE#"$ROOT"/}"
 	script="$(mktemp -t knownoutlineat.XXXXXX.js)"
-	trap 'rm -f "$script"' EXIT
+	tmp_scripts+=("$script")
 	cat > "$script" <<'JS'
 var page = Document.openDocument(scriptArgs[0]).loadPage(0);
 function chars(o) { return page.toStructuredText(o).asText().replace(/\s+/g, ""); }
@@ -156,7 +160,7 @@ ASCII_SAMPLE="$CORPUS_DIR/known-glyph-outlines/ascii-tounicode-sample.pdf"
 if [[ -f "$ASCII_SAMPLE" ]]; then
 	printf '==> known-glyph-outline ASCII ToUnicode assertion (%s)\n' "${ASCII_SAMPLE#"$ROOT"/}"
 	script="$(mktemp -t knownoutlineascii.XXXXXX.js)"
-	trap 'rm -f "$script"' EXIT
+	tmp_scripts+=("$script")
 	cat > "$script" <<'JS'
 var page = Document.openDocument(scriptArgs[0]).loadPage(0);
 function count(o, c) { return page.toStructuredText(o).asText().split(c).length - 1; }
@@ -175,7 +179,7 @@ fi
 if [[ -f "$TU_SAMPLE" ]]; then
 	printf '==> space-after-symbols assertion (%s)\n' "${TU_SAMPLE#"$ROOT"/}"
 	script="$(mktemp -t spacesym.XXXXXX.js)"
-	trap 'rm -f "$script"' EXIT
+	tmp_scripts+=("$script")
 	cat > "$script" <<'JS'
 var page = Document.openDocument(scriptArgs[0]).loadPage(0);
 var off = page.toStructuredText("preserve-whitespace,use-known-glyph-outlines").asText();
@@ -197,7 +201,7 @@ SPACING_SAMPLE="$CORPUS_DIR/known-glyph-outlines/symbol-spacing-sample.pdf"
 if [[ -f "$SPACING_SAMPLE" ]]; then
 	printf '==> space-after-symbols boundary assertion (%s)\n' "${SPACING_SAMPLE#"$ROOT"/}"
 	script="$(mktemp -t spacebound.XXXXXX.js)"
-	trap 'rm -f "$script"' EXIT
+	tmp_scripts+=("$script")
 	cat > "$script" <<'JS'
 var page = Document.openDocument(scriptArgs[0]).loadPage(0);
 function lines(o) { return page.toStructuredText(o).asText().split("\n").filter(function (l) { return l.length; }).join("|"); }
