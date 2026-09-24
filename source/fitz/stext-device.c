@@ -636,7 +636,13 @@ static int may_add_space(int lastchar, int c, int flags)
 	 * dingbats), and mathematical alphanumerics; never before text in a
 	 * script written without spaces, attached punctuation, or a quote. */
 	if ((flags & FZ_STEXT_SPACE_AFTER_SYMBOLS) && !is_unspaced_script(c) && !no_space_before(c))
+	{
+		/* A minus directly before a digit is usually a sign or an exponent
+		 * ("(−6.15)", "10−5", "yt−1"), not subtraction: keep it attached. */
+		if ((lastchar == 0x2212 || lastchar == 0x2213) && c >= '0' && c <= '9')
+			return 0;
 		return (lastchar >= 0x2100 && lastchar <= 0x2BFF) || (lastchar >= 0x1D400 && lastchar <= 0x1D7FF);
+	}
 	return 0;
 }
 

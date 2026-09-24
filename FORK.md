@@ -91,6 +91,11 @@ drawn:
     `\x8a`; TeX extension fonts map `∑` to `X` and `−` to `2`) and never
     overrides a plausible ToUnicode value, e.g. `µ` vs `μ`, ASCII
     punctuation, or a letter label.
+  - A spacing accent (`´ ¨ ¯ ¸ ˆ ˇ ˘ ˙ ˚ ˛ ˜ ˝`) is never replaced by a
+    character it can look like (a prime, degree or ring, quote, tilde or
+    dot): text fonts draw accents as separate glyphs (`Ame´rica`), and only
+    an accent can be recombined into a letter. A real symbol in an accent
+    slot (an element-of in `ogonek`) is still repaired.
   - Known limitation: in a Symbol-layout font whose ToUnicode maps Greek
     body text to ASCII letters, only Greek letters that cannot pass for Latin
     ones are replaced, so a word can come out mixed (`λoγoς`). In the test
@@ -126,7 +131,8 @@ mutool run /tmp/check.js sample.pdf   # 20 mg of NP-Ova / 20 μg of NP-Ova
 `make fork-regression-test` asserts this on
 `fork-regressions/data/known-glyph-outlines/sample.pdf` (no ToUnicode: `20 mg`
 → `20 μg`), `tounicode-sample.pdf` (broken ToUnicode: `Nc ¼ N` →
-`Nc = N −Nt`), `ascii-tounicode-sample.pdf` (ToUnicode `X` → `∑`) and
+`Nc = N −Nt`), `ascii-tounicode-sample.pdf` (ToUnicode `X` → `∑`),
+`accent-sample.pdf` (a spacing acute accent stays an accent) and
 `actualtext-sample.pdf` (ActualText-confirmed `m` stays `m`), and
 `space-after-symbols` on `tounicode-sample.pdf` (`N −Nt` → `N − Nt`).
 
@@ -165,6 +171,10 @@ miscellaneous symbols and arrows) and mathematical alphanumerics
   so the option never adds a space before one. The cost is a missed space
   before an opening quote after a symbol; French shows it most, since it
   spaces before an opening `«` (`→ « texte »` stays `→« texte »`).
+
+A minus (`−`, `∓`) directly before a digit is also left attached: it is
+usually a sign or an exponent (`(−6.15)`, `10−5`, `yt−1`), not subtraction.
+The cost is that subtraction written `n − 1` stays `n −1`, as upstream.
 
 Everything else keeps upstream behavior.
 

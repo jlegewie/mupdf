@@ -222,6 +222,34 @@ is_distinct_greek(int c)
 	return (c >= 0x391 && c <= 0x3A9) || (c >= 0x3B1 && c <= 0x3C9) || (c >= 0x3D0 && c <= 0x3F5);
 }
 
+/* Spacing accents: text fonts draw them as separate glyphs over a letter
+ * ("Ame´rica"), where they can still be recombined into a letter. */
+static int
+is_spacing_accent(int c)
+{
+	return c == 0xA8 || c == 0xAF || c == 0xB4 || c == 0xB8 || /* ¨ ¯ ´ ¸ */
+		(c >= 0x2C6 && c <= 0x2DD); /* ˆ ˇ ˉ … ˘ ˙ ˚ ˛ ˜ ˝ */
+}
+
+/* Characters a spacing accent can be drawn identically to: primes, degree
+ * and ring, quotes, tildes and dots. An accent is never overridden with one
+ * of these; a symbol font that puts a real symbol in an accent slot (an
+ * element-of in "ogonek") is still repaired. */
+static int
+is_accent_lookalike(int c)
+{
+	switch (c)
+	{
+	case 0x2032: case 0x2033: case 0x2034: case 0x2035: /* ′ ″ ‴ ‵ */
+	case 0xB0: case 0x2DA: /* ° ˚ */
+	case '\'': case '`': case 0x2018: case 0x2019: case 0x201C: case 0x201D: /* quotes */
+	case '~': case 0x223C: case 0x2DC: /* tildes */
+	case 0xB7: case 0x22C5: case 0x2D9: /* dots */
+		return 1;
+	}
+	return 0;
+}
+
 int
 fz_known_glyph_outline_override(fz_context *ctx, fz_font *font, int gid, int current)
 {
@@ -237,6 +265,8 @@ fz_known_glyph_outline_override(fz_context *ctx, fz_font *font, int gid, int cur
 
 	known = fz_known_glyph_outline_unicode(ctx, font, gid);
 	if (!known || known == current)
+		return current;
+	if (is_spacing_accent(current) && is_accent_lookalike(known))
 		return current;
 
 	if (font->flags.unicode_from_glyph_names || is_garbage_unicode(current))

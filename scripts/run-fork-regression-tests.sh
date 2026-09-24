@@ -211,13 +211,34 @@ var spaced = ["A", "\uffa1\uffa4", "\u3131", "\u3260", "\u3200", "\u00bf", "\u04
 var cases = ["A", "\uffa1\uffa4", "\u201d", ")", "\u4e2d", "\"", "'", "\u3131", "\u3260", "\u3200",
 	"\u201c", "\u00ab", "\u00bb", "\u201e", "\u037e", "\u060c", "\u061f", "\u0964", "\ufe50",
 	"\u0e01", "\u0e81", "\u00bf", "\u0416", "\u00e9"];
-var wantOff = cases.map(function (t) { return "\u2192" + t; }).join("|");
-var wantOn = cases.map(function (t) { return "\u2192" + (spaced.indexOf(t) >= 0 ? " " : "") + t; }).join("|");
+// A minus before a digit is a sign or exponent: no space; before a letter it gets one.
+var wantOff = cases.map(function (t) { return "\u2192" + t; }).join("|") + "|\u22125|\u2212x";
+var wantOn = cases.map(function (t) { return "\u2192" + (spaced.indexOf(t) >= 0 ? " " : "") + t; }).join("|") + "|\u22125|\u2212 x";
 if (off != wantOff)
 	throw new Error("FAIL: without the option no space should follow the symbol, got " + JSON.stringify(off));
 if (on != wantOn)
 	throw new Error("FAIL: space-after-symbols boundaries wrong, got " + JSON.stringify(on));
-print("OK: space-after-symbols boundaries (24 cases: quotes, script punctuation, unspaced scripts, Hangul)");
+print("OK: space-after-symbols boundaries (26 cases: quotes, script punctuation, unspaced scripts, Hangul, minus before digit)");
 JS
 	"$MUTOOL" run "$script" "$SPACING_SAMPLE"
+fi
+
+# Same option, text font without ToUnicode that draws the acute accent of
+# accented words as a separate glyph ("Ame´rica"). Its outline matches a prime
+# in the table, but a spacing accent must stay an accent.
+ACCENT_SAMPLE="$CORPUS_DIR/known-glyph-outlines/accent-sample.pdf"
+if [[ -f "$ACCENT_SAMPLE" ]]; then
+	printf '==> known-glyph-outline accent assertion (%s)\n' "${ACCENT_SAMPLE#"$ROOT"/}"
+	script="$(mktemp -t knownoutlineaccent.XXXXXX.js)"
+	tmp_scripts+=("$script")
+	cat > "$script" <<'JS'
+var page = Document.openDocument(scriptArgs[0]).loadPage(0);
+var on = page.toStructuredText("preserve-whitespace,use-known-glyph-outlines").asText();
+if (on.indexOf("Ame\u00b4rica") < 0)
+	throw new Error("FAIL: the spacing acute accent should be kept (Ame\u00b4rica)");
+if (on.indexOf("\u2032") >= 0)
+	throw new Error("FAIL: a spacing accent must not become a prime");
+print("OK: known-glyph-outline keeps spacing accents");
+JS
+	"$MUTOOL" run "$script" "$ACCENT_SAMPLE"
 fi
