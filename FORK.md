@@ -144,7 +144,8 @@ The opt-in `space-after-symbols` option (`FZ_STEXT_SPACE_AFTER_SYMBOLS`)
 extends the heuristic to U+2100-U+2BFF (letterlike symbols through
 miscellaneous symbols and arrows) and mathematical alphanumerics
 (U+1D400-U+1D7FF), except when the next character is Chinese or Japanese
-(written without spaces: `260 ℃之间`) or closing punctuation (closing brackets
+(written without spaces: `260 ℃之间`; Korean, including Hangul jamo and
+circled or parenthesized Hangul, keeps its spaces) or closing punctuation (closing brackets
 and final quotes in any script, `, . ; : ! ? …`, and the ASCII quotes `'` and
 `"`, which may close). Other scripts keep
 upstream behavior.

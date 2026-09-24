@@ -563,6 +563,10 @@ vec_dot(const fz_point *a, const fz_point *b)
  * included). */
 static int is_cjk(int c)
 {
+	if ((c >= 0x3130 && c <= 0x318F) || /* hangul compatibility jamo */
+		(c >= 0x3200 && c <= 0x321E) || /* parenthesized hangul */
+		(c >= 0x3260 && c <= 0x327E)) /* circled hangul */
+		return 0;
 	return (c >= 0x2E80 && c <= 0x9FFF) || /* radicals, punctuation, kana, ideographs */
 		(c >= 0xF900 && c <= 0xFAFF) || /* compatibility ideographs */
 		(c >= 0xFF00 && c <= 0xFF9F) || /* fullwidth forms, halfwidth katakana */

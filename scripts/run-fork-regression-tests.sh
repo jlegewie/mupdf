@@ -190,7 +190,7 @@ JS
 fi
 
 # `space-after-symbols` boundaries: a gap after a symbol becomes a space before
-# Latin text and halfwidth Hangul (Korean uses word spaces), but not before a
+# Latin text and every Hangul form (Korean uses word spaces), but not before a
 # closing quote or bracket, an ASCII quote, or Chinese/Japanese text.
 SPACING_SAMPLE="$CORPUS_DIR/known-glyph-outlines/symbol-spacing-sample.pdf"
 if [[ -f "$SPACING_SAMPLE" ]]; then
@@ -201,13 +201,13 @@ if [[ -f "$SPACING_SAMPLE" ]]; then
 var page = Document.openDocument(scriptArgs[0]).loadPage(0);
 function lines(o) { return page.toStructuredText(o).asText().split("\n").filter(function (l) { return l.length; }).join("|"); }
 var off = lines("preserve-whitespace"), on = lines("preserve-whitespace,space-after-symbols");
-var wantOff = "→A|→ﾡﾤ|→”|→)|→中|→\"|→'";
-var wantOn = "→ A|→ ﾡﾤ|→”|→)|→中|→\"|→'";
+var wantOff = "→A|→ﾡﾤ|→”|→)|→中|→\"|→'|→ㄱ|→㉠|→㈀";
+var wantOn = "→ A|→ ﾡﾤ|→”|→)|→中|→\"|→'|→ ㄱ|→ ㉠|→ ㈀";
 if (off != wantOff)
 	throw new Error("FAIL: without the option no space should follow the symbol, got " + JSON.stringify(off));
 if (on != wantOn)
 	throw new Error("FAIL: space-after-symbols boundaries wrong, got " + JSON.stringify(on));
-print("OK: space-after-symbols boundaries (Latin, halfwidth Hangul, closing quote, bracket, CJK, ASCII quotes)");
+print("OK: space-after-symbols boundaries (Latin, Hangul forms, closing quote, bracket, CJK, ASCII quotes)");
 JS
 	"$MUTOOL" run "$script" "$SPACING_SAMPLE"
 fi
