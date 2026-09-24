@@ -148,3 +148,66 @@ print("OK: known-glyph-outline respects ActualText");
 JS
 	"$MUTOOL" run "$script" "$AT_SAMPLE"
 fi
+
+# Same option, ToUnicode maps a TeX-style extension font's summation to the
+# ASCII letter "X": ON must replace it (an ASCII letter is overridden only by a
+# symbol from the table).
+ASCII_SAMPLE="$CORPUS_DIR/known-glyph-outlines/ascii-tounicode-sample.pdf"
+if [[ -f "$ASCII_SAMPLE" ]]; then
+	printf '==> known-glyph-outline ASCII ToUnicode assertion (%s)\n' "${ASCII_SAMPLE#"$ROOT"/}"
+	script="$(mktemp -t knownoutlineascii.XXXXXX.js)"
+	trap 'rm -f "$script"' EXIT
+	cat > "$script" <<'JS'
+var page = Document.openDocument(scriptArgs[0]).loadPage(0);
+function count(o, c) { return page.toStructuredText(o).asText().split(c).length - 1; }
+var off = "preserve-whitespace", on = "preserve-whitespace,use-known-glyph-outlines";
+if (count(off, "X") != 2 || count(off, "∑") != 0)
+	throw new Error("FAIL: option OFF should keep the ToUnicode X");
+if (count(on, "X") != 0 || count(on, "∑") != 2)
+	throw new Error("FAIL: option ON should replace the ToUnicode X with ∑");
+print("OK: known-glyph-outline ASCII ToUnicode off=upstream on=recovered");
+JS
+	"$MUTOOL" run "$script" "$ASCII_SAMPLE"
+fi
+
+# `space-after-symbols`: a word gap after a math symbol becomes a space only
+# with the option (upstream never adds one after U+2100 and above).
+if [[ -f "$TU_SAMPLE" ]]; then
+	printf '==> space-after-symbols assertion (%s)\n' "${TU_SAMPLE#"$ROOT"/}"
+	script="$(mktemp -t spacesym.XXXXXX.js)"
+	trap 'rm -f "$script"' EXIT
+	cat > "$script" <<'JS'
+var page = Document.openDocument(scriptArgs[0]).loadPage(0);
+var off = page.toStructuredText("preserve-whitespace,use-known-glyph-outlines").asText();
+var on = page.toStructuredText("preserve-whitespace,use-known-glyph-outlines,space-after-symbols").asText();
+if (off.indexOf("Nc = N −Nt") < 0)
+	throw new Error("FAIL: without space-after-symbols the gap after − should stay closed");
+if (on.indexOf("Nc = N − Nt") < 0)
+	throw new Error("FAIL: space-after-symbols should turn the gap after − into a space");
+print("OK: space-after-symbols off=upstream on=spaced");
+JS
+	"$MUTOOL" run "$script" "$TU_SAMPLE"
+fi
+
+# `space-after-symbols` boundaries: a gap after a symbol becomes a space before
+# Latin text and halfwidth Hangul (Korean uses word spaces), but not before a
+# closing quote or bracket, an ASCII quote, or Chinese/Japanese text.
+SPACING_SAMPLE="$CORPUS_DIR/known-glyph-outlines/symbol-spacing-sample.pdf"
+if [[ -f "$SPACING_SAMPLE" ]]; then
+	printf '==> space-after-symbols boundary assertion (%s)\n' "${SPACING_SAMPLE#"$ROOT"/}"
+	script="$(mktemp -t spacebound.XXXXXX.js)"
+	trap 'rm -f "$script"' EXIT
+	cat > "$script" <<'JS'
+var page = Document.openDocument(scriptArgs[0]).loadPage(0);
+function lines(o) { return page.toStructuredText(o).asText().split("\n").filter(function (l) { return l.length; }).join("|"); }
+var off = lines("preserve-whitespace"), on = lines("preserve-whitespace,space-after-symbols");
+var wantOff = "→A|→ﾡﾤ|→”|→)|→中|→\"|→'";
+var wantOn = "→ A|→ ﾡﾤ|→”|→)|→中|→\"|→'";
+if (off != wantOff)
+	throw new Error("FAIL: without the option no space should follow the symbol, got " + JSON.stringify(off));
+if (on != wantOn)
+	throw new Error("FAIL: space-after-symbols boundaries wrong, got " + JSON.stringify(on));
+print("OK: space-after-symbols boundaries (Latin, halfwidth Hangul, closing quote, bracket, CJK, ASCII quotes)");
+JS
+	"$MUTOOL" run "$script" "$SPACING_SAMPLE"
+fi

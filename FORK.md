@@ -15,6 +15,7 @@ The `fork` branch is based on the upstream tag **1.27.2** and contains a small s
 | `source/pdf/pdf-page.c` | Tolerate dangling/non-page kids in the page tree, and rebuild the page map if a mid-walk repair drops it, so a truncated PDF still yields the pages it does have |
 | `source/pdf/pdf-type3.c`, `source/fitz/font.c`, `include/mupdf/fitz/glyph-cache.h` | Deduplicate Type 3 `CharProcs`: load each distinct glyph stream once and share its display list across the many character codes an `/Encoding` maps onto it |
 | `source/fitz/known-glyph-outlines.c`, `source/fitz/known-glyph-outlines-table.h`, `source/fitz/stext-device.c`, `source/pdf/pdf-font.c`, `source/fitz/font.c`, `include/mupdf/fitz/font.h`, `include/mupdf/fitz/structured-text.h`, `platform/win32/libmupdf.vcxproj{,.filters}` | New `use-known-glyph-outlines` stext option (`FZ_STEXT_USE_KNOWN_GLYPH_OUTLINES`): for embedded simple fonts, a glyph whose outline hash is in a reviewed table gets the character the outline actually draws (always without a ToUnicode CMap; with one, only when the ToUnicode value cannot be right) |
+| `source/fitz/stext-device.c`, `include/mupdf/fitz/structured-text.h` | New `space-after-symbols` stext option (`FZ_STEXT_SPACE_AFTER_SYMBOLS`): word gaps after math, arrow, shape and dingbat symbols become spaces |
 | `FORK.md` | This file |
 
 ## Why the glyph-name option exists
@@ -79,11 +80,17 @@ drawn:
   - Without a ToUnicode CMap the table always wins; where the current
     character already matches it the override is a no-op.
   - With a ToUnicode CMap the table only replaces values that cannot be
-    right: U+FFFD or a control character, or a Latin-1 letter or vulgar
-    fraction when the table says the outline is not a letter. This targets
-    broken producer CMaps (Elsevier's ToUnicode maps its Computer Modern
-    `( ) = + [ ]` outlines to `ð Þ ¼ þ ½` and `\x8a`) and never overrides a
-    plausible ToUnicode value, e.g. `µ` vs `μ` or ASCII punctuation.
+    right: U+FFFD or a control character; a Latin-1 letter or vulgar
+    fraction when the table says the outline is not a letter; or an ASCII
+    letter or digit when the table says the outline is a symbol (Unicode
+    category S*) or a Greek letter that looks unlike any Latin letter
+    (Symbol-layout fonts map μ to `m` and Δ to `D`; capitals such as Α and
+    lowercase ι κ ν ο ρ υ χ ω, which can pass for Latin letters, are
+    excluded). This targets broken producer CMaps (Elsevier's ToUnicode
+    maps its Computer Modern `( ) = + [ ]` outlines to `ð Þ ¼ þ ½` and
+    `\x8a`; TeX extension fonts map `∑` to `X` and `−` to `2`) and never
+    overrides a plausible ToUnicode value, e.g. `µ` vs `μ`, ASCII
+    punctuation, or a letter label.
   - Upstream MuPDF already drops ToUnicode values that are C0/C1 control
     characters (`pdf-op-run.c`) and falls back to the glyph-name mapping;
     those glyphs typically arrive here as U+FFFD.
@@ -113,7 +120,9 @@ mutool run /tmp/check.js sample.pdf   # 20 mg of NP-Ova / 20 μg of NP-Ova
 `make fork-regression-test` asserts this on
 `fork-regressions/data/known-glyph-outlines/sample.pdf` (no ToUnicode: `20 mg`
 → `20 μg`), `tounicode-sample.pdf` (broken ToUnicode: `Nc ¼ N` →
-`Nc = N −Nt`) and `actualtext-sample.pdf` (ActualText-confirmed `m` stays `m`).
+`Nc = N −Nt`), `ascii-tounicode-sample.pdf` (ToUnicode `X` → `∑`) and
+`actualtext-sample.pdf` (ActualText-confirmed `m` stays `m`), and
+`space-after-symbols` on `tounicode-sample.pdf` (`N −Nt` → `N − Nt`).
 
 No upstream MuPDF mechanism covers this (checked against 1.27.2 and upstream
 `master` as of 2026-09-23): the glyph-name heuristics (`C<n>` here, `gXXXX` and
@@ -121,9 +130,24 @@ No upstream MuPDF mechanism covers this (checked against 1.27.2 and upstream
 `Symbol`/`ZapfDingbats` handling only affects substitution of non-embedded
 fonts, and nothing compares glyph outlines with their mapped characters.
 
-Note: MuPDF's word-gap heuristic (`may_add_space` in `stext-device.c`) never
-inserts a synthesized space after characters above U+20CF, so a recovered
-`≥`, `−` or `○` may lose a following space that the misread Latin letter had.
+## Why the space-after-symbols option exists
+
+MuPDF's word-gap heuristic (`may_add_space` in `stext-device.c`) only turns a
+gap into a space after Latin, Greek, Cyrillic, Hebrew, Arabic, punctuation and
+currency characters. After a math operator, arrow, geometric shape or dingbat
+it never does, so `○ Lead contact` extracts as `○Lead contact` and
+`O2 → N2` as `O2 →N2`. Recovered symbols are hit hardest (the misread Latin
+letter they replace did get its space), but correctly mapped symbols are
+affected too.
+
+The opt-in `space-after-symbols` option (`FZ_STEXT_SPACE_AFTER_SYMBOLS`)
+extends the heuristic to U+2100-U+2BFF (letterlike symbols through
+miscellaneous symbols and arrows) and mathematical alphanumerics
+(U+1D400-U+1D7FF), except when the next character is Chinese or Japanese
+(written without spaces: `260 ℃之间`) or closing punctuation (closing brackets
+and final quotes in any script, `, . ; : ! ? …`, and the ASCII quotes `'` and
+`"`, which may close). Other scripts keep
+upstream behavior.
 
 ## WASM Form XObject nesting guard
 

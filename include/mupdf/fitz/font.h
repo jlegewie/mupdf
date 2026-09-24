@@ -859,10 +859,13 @@ int fz_known_glyph_outline_unicode(fz_context *ctx, fz_font *font, int gid);
 	wrong.
 
 	For an embedded simple font with a ToUnicode CMap, the table only
-	overrides values that cannot be right: U+FFFD or a control character,
-	or a Latin-1 letter or vulgar fraction (U+00A0-U+00FF) where the table
+	overrides values that cannot be right: U+FFFD or a control character;
+	a Latin-1 letter or vulgar fraction (U+00A0-U+00FF) where the table
 	says the outline is not a letter (Elsevier's ToUnicode maps its "(" to
-	"ð" and "=" to "¼").
+	"ð" and "=" to "¼"); or an ASCII letter or digit where the table says
+	the outline is a symbol or a Greek letter that cannot pass for a Latin
+	one (a TeX extension font's summation mapped to "X", a Symbol-layout mu
+	mapped to "m").
 
 	Returns the character to use; current if there is no override.
 */

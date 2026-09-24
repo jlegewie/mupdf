@@ -20,6 +20,7 @@
 // CA 94129, USA, for further information.
 
 #include "mupdf/fitz.h"
+#include "mupdf/ucdn.h"
 
 #include "glyphbox.h"
 
@@ -175,6 +176,7 @@ const char *fz_stext_options_usage =
 	"\tuse-gid-for-unknown-unicode: use glyph index if unicode mapping fails\n"
 	"\tuse-glyph-name-for-unknown-unicode: decode numeric \"C<n>\" glyph names if unicode mapping fails\n"
 	"\tuse-known-glyph-outlines: replace wrong unicode with the character a known symbol outline draws\n"
+	"\tspace-after-symbols: allow word gaps after math, arrow, shape and dingbat symbols\n"
 	"\taccurate-bboxes: calculate char bboxes from the outlines\n"
 	"\taccurate-ascenders: calculate ascender/descender from font glyphs\n"
 	"\taccurate-side-bearings: expand char bboxes to completely include width of glyphs\n"
@@ -556,14 +558,50 @@ vec_dot(const fz_point *a, const fz_point *b)
 	return a->x * b->x + a->y * b->y;
 }
 
-static int may_add_space(int lastchar)
+/* Chinese and Japanese text is written without spaces between words
+ * (Korean uses spaces, so Hangul, including halfwidth Hangul, is not
+ * included). */
+static int is_cjk(int c)
 {
+	return (c >= 0x2E80 && c <= 0x9FFF) || /* radicals, punctuation, kana, ideographs */
+		(c >= 0xF900 && c <= 0xFAFF) || /* compatibility ideographs */
+		(c >= 0xFF00 && c <= 0xFF9F) || /* fullwidth forms, halfwidth katakana */
+		(c >= 0xFFE0 && c <= 0xFFEF) || /* fullwidth signs */
+		(c >= 0x20000 && c <= 0x3FFFF); /* supplementary ideographs */
+}
+
+/* Punctuation that attaches to the preceding text: closing brackets and
+ * final quotes in any script, and sentence punctuation. ASCII quotes can open
+ * or close, so they are included too: no space is added before them. */
+static int is_closing_punct(int c)
+{
+	int cat;
+	if (c < 128)
+		return c != 0 && strchr(")]},.;:!?'\"", c) != NULL;
+	if (c == 0x2026) /* horizontal ellipsis */
+		return 1;
+	cat = ucdn_get_general_category(c);
+	return cat == UCDN_GENERAL_CATEGORY_PE || cat == UCDN_GENERAL_CATEGORY_PF;
+}
+
+static int may_add_space(int lastchar, int c, int flags)
+{
+	if (lastchar == ' ')
+		return 0;
 	/* Basic latin, greek, cyrillic, hebrew, arabic,
 	 * general punctuation,
 	 * superscripts and subscripts,
 	 * and currency symbols.
 	 */
-	return (lastchar != ' ' && (lastchar < 0x700 || (lastchar >= 0x2000 && lastchar <= 0x20CF)));
+	if (lastchar < 0x700 || (lastchar >= 0x2000 && lastchar <= 0x20CF))
+		return 1;
+	/* Optionally also symbols: letterlike symbols through miscellaneous
+	 * symbols and arrows (math operators, arrows, geometric shapes,
+	 * dingbats), and mathematical alphanumerics; never before CJK text or
+	 * closing punctuation. */
+	if ((flags & FZ_STEXT_SPACE_AFTER_SYMBOLS) && !is_cjk(c) && !is_closing_punct(c))
+		return (lastchar >= 0x2100 && lastchar <= 0x2BFF) || (lastchar >= 0x1D400 && lastchar <= 0x1D7FF);
+	return 0;
 }
 
 #define FAKEBOLD_THRESHOLD_RECIP (1.0f / FAKE_BOLD_MAX_DIST)
@@ -891,7 +929,7 @@ fz_add_stext_char_imp(fz_context *ctx, fz_stext_device *dev, fz_font *font, int 
 				/* And any other small jump could be a missing space. */
 				else if (logical_spacing < 0 && logical_spacing > -SPACE_MAX_DIST)
 				{
-					if (wmode == 0 && may_add_space(dev->lastchar))
+					if (wmode == 0 && may_add_space(dev->lastchar, c, dev->flags))
 						add_space = 1;
 					new_line = 0;
 				}
@@ -904,7 +942,7 @@ fz_add_stext_char_imp(fz_context *ctx, fz_stext_device *dev, fz_font *font, int 
 				else if (spacing > 0 && spacing < SPACE_MAX_DIST)
 				{
 					bidi = 3; /* mark line as visual */
-					if (wmode == 0 && may_add_space(dev->lastchar))
+					if (wmode == 0 && may_add_space(dev->lastchar, c, dev->flags))
 						add_space = 1 + (spacing > SPACE_DIST*2);
 					new_line = 0;
 				}
@@ -933,7 +971,7 @@ fz_add_stext_char_imp(fz_context *ctx, fz_stext_device *dev, fz_font *font, int 
 				else if (spacing > 0 && spacing < SPACE_MAX_DIST)
 				{
 					/* Motion is forward in line and large enough to warrant us adding a space. */
-					if (wmode == 0 && may_add_space(dev->lastchar))
+					if (wmode == 0 && may_add_space(dev->lastchar, c, dev->flags))
 						add_space = 1 + (spacing > SPACE_DIST*2);
 					new_line = 0;
 				}
@@ -2099,6 +2137,8 @@ fz_parse_stext_options(fz_context *ctx, fz_stext_options *opts, const char *stri
 		opts->flags |= FZ_STEXT_USE_GLYPH_NAME_FOR_UNKNOWN_UNICODE;
 	if (fz_has_option(ctx, string, "use-known-glyph-outlines", &val) && fz_option_eq(val, "yes"))
 		opts->flags |= FZ_STEXT_USE_KNOWN_GLYPH_OUTLINES;
+	if (fz_has_option(ctx, string, "space-after-symbols", &val) && fz_option_eq(val, "yes"))
+		opts->flags |= FZ_STEXT_SPACE_AFTER_SYMBOLS;
 	if (fz_has_option(ctx, string, "accurate-bboxes", &val) && fz_option_eq(val, "yes"))
 		opts->flags |= FZ_STEXT_ACCURATE_BBOXES;
 	if (fz_has_option(ctx, string, "vectors", &val) && fz_option_eq(val, "yes"))

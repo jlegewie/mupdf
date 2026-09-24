@@ -206,6 +206,13 @@ typedef struct fz_stext_grid_positions fz_stext_grid_positions;
 	wins; with one, it only replaces values that cannot be right (see
 	fz_known_glyph_outline_override).
 
+	FZ_STEXT_SPACE_AFTER_SYMBOLS: By default, a word gap is only turned into
+	a space after Latin, Greek, Cyrillic, Hebrew, Arabic, punctuation and
+	currency characters. With this option set, gaps after symbols
+	(U+2100-U+2BFF: math operators, arrows, geometric shapes, dingbats) and
+	mathematical alphanumerics (U+1D400-U+1D7FF) become spaces too, except
+	before Chinese or Japanese text or closing punctuation.
+
 */
 enum
 {
@@ -233,6 +240,7 @@ enum
 	FZ_STEXT_FUZZY_VECTORS = (1<<21),
 	FZ_STEXT_USE_GLYPH_NAME_FOR_UNKNOWN_UNICODE = (1<<22),
 	FZ_STEXT_USE_KNOWN_GLYPH_OUTLINES = (1<<23),
+	FZ_STEXT_SPACE_AFTER_SYMBOLS = (1<<24),
 
 	/* An old, deprecated option. */
 	FZ_STEXT_MEDIABOX_CLIP = FZ_STEXT_CLIP
