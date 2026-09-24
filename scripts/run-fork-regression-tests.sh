@@ -190,8 +190,9 @@ JS
 fi
 
 # `space-after-symbols` boundaries: a gap after a symbol becomes a space before
-# Latin text and every Hangul form (Korean uses word spaces), but not before a
-# closing quote or bracket, an ASCII quote, or Chinese/Japanese text.
+# Latin, Cyrillic, Spanish ¿ and every Hangul form (Korean uses word spaces),
+# but not before any quote, attached punctuation in any script, or text in a
+# script written without spaces (Chinese, Thai, Lao).
 SPACING_SAMPLE="$CORPUS_DIR/known-glyph-outlines/symbol-spacing-sample.pdf"
 if [[ -f "$SPACING_SAMPLE" ]]; then
 	printf '==> space-after-symbols boundary assertion (%s)\n' "${SPACING_SAMPLE#"$ROOT"/}"
@@ -201,13 +202,18 @@ if [[ -f "$SPACING_SAMPLE" ]]; then
 var page = Document.openDocument(scriptArgs[0]).loadPage(0);
 function lines(o) { return page.toStructuredText(o).asText().split("\n").filter(function (l) { return l.length; }).join("|"); }
 var off = lines("preserve-whitespace"), on = lines("preserve-whitespace,space-after-symbols");
-var wantOff = "→A|→ﾡﾤ|→”|→)|→中|→\"|→'|→ㄱ|→㉠|→㈀";
-var wantOn = "→ A|→ ﾡﾤ|→”|→)|→中|→\"|→'|→ ㄱ|→ ㉠|→ ㈀";
+// One line per case: an arrow, a gap, then the next text.
+var spaced = ["A", "\uffa1\uffa4", "\u3131", "\u3260", "\u3200", "\u00bf", "\u0416", "\u00e9"];
+var cases = ["A", "\uffa1\uffa4", "\u201d", ")", "\u4e2d", "\"", "'", "\u3131", "\u3260", "\u3200",
+	"\u201c", "\u00ab", "\u00bb", "\u201e", "\u037e", "\u060c", "\u061f", "\u0964", "\ufe50",
+	"\u0e01", "\u0e81", "\u00bf", "\u0416", "\u00e9"];
+var wantOff = cases.map(function (t) { return "\u2192" + t; }).join("|");
+var wantOn = cases.map(function (t) { return "\u2192" + (spaced.indexOf(t) >= 0 ? " " : "") + t; }).join("|");
 if (off != wantOff)
 	throw new Error("FAIL: without the option no space should follow the symbol, got " + JSON.stringify(off));
 if (on != wantOn)
 	throw new Error("FAIL: space-after-symbols boundaries wrong, got " + JSON.stringify(on));
-print("OK: space-after-symbols boundaries (Latin, Hangul forms, closing quote, bracket, CJK, ASCII quotes)");
+print("OK: space-after-symbols boundaries (24 cases: quotes, script punctuation, unspaced scripts, Hangul)");
 JS
 	"$MUTOOL" run "$script" "$SPACING_SAMPLE"
 fi

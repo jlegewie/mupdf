@@ -211,7 +211,8 @@ typedef struct fz_stext_grid_positions fz_stext_grid_positions;
 	currency characters. With this option set, gaps after symbols
 	(U+2100-U+2BFF: math operators, arrows, geometric shapes, dingbats) and
 	mathematical alphanumerics (U+1D400-U+1D7FF) become spaces too, except
-	before Chinese or Japanese text or closing punctuation.
+	before text in a script written without spaces (Chinese, Japanese,
+	Thai, ...), attached punctuation, or any quote.
 
 */
 enum

@@ -91,6 +91,11 @@ drawn:
     `\x8a`; TeX extension fonts map `∑` to `X` and `−` to `2`) and never
     overrides a plausible ToUnicode value, e.g. `µ` vs `μ`, ASCII
     punctuation, or a letter label.
+  - Known limitation: in a Symbol-layout font whose ToUnicode maps Greek
+    body text to ASCII letters, only Greek letters that cannot pass for Latin
+    ones are replaced, so a word can come out mixed (`λoγoς`). In the test
+    corpus every font that triggers this replacement is a math font used for
+    inline symbols (μM, β, Δ); Greek body text set this way was not seen.
   - Upstream MuPDF already drops ToUnicode values that are C0/C1 control
     characters (`pdf-op-run.c`) and falls back to the glyph-name mapping;
     those glyphs typically arrive here as U+FFFD.
@@ -143,12 +148,24 @@ affected too.
 The opt-in `space-after-symbols` option (`FZ_STEXT_SPACE_AFTER_SYMBOLS`)
 extends the heuristic to U+2100-U+2BFF (letterlike symbols through
 miscellaneous symbols and arrows) and mathematical alphanumerics
-(U+1D400-U+1D7FF), except when the next character is Chinese or Japanese
-(written without spaces: `260 ℃之间`; Korean, including Hangul jamo and
-circled or parenthesized Hangul, keeps its spaces) or closing punctuation (closing brackets
-and final quotes in any script, `, . ; : ! ? …`, and the ASCII quotes `'` and
-`"`, which may close). Other scripts keep
-upstream behavior.
+(U+1D400-U+1D7FF), except before:
+
+- text in a script written without spaces: Chinese, Japanese, Thai, Lao,
+  Tibetan, Myanmar, Khmer, Yi (`260 ℃之间`). Korean uses spaces, so every
+  Hangul form keeps them. Rarer unspaced scripts (Javanese, Balinese, Tai
+  Tham, New Tai Lue, Tai Le, Tai Viet) are not listed and may get a space;
+- punctuation that attaches to the preceding text in any script (closing
+  brackets, `, . ; : ! ? …`, Greek `;` and ano teleia U+0387 (not U+00B7, which
+  doubles as a multiplication dot), Arabic `، ؛ ؟`, Devanagari `। ॥`,
+  Armenian, Ethiopic and Myanmar marks, and the CJK small and vertical form
+  blocks, which also contain a few brackets and symbols);
+- any quote (`' " ‘ ’ ‚ “ ” „ « » ‹ ›`): whether a quote opens or closes
+  depends on the language (German closes with `“`, Danish opens with `»`),
+  so the option never adds a space before one. The cost is a missed space
+  before an opening quote after a symbol; French shows it most, since it
+  spaces before an opening `«` (`→ « texte »` stays `→« texte »`).
+
+Everything else keeps upstream behavior.
 
 ## WASM Form XObject nesting guard
 

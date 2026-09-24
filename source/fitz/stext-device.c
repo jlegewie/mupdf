@@ -558,34 +558,66 @@ vec_dot(const fz_point *a, const fz_point *b)
 	return a->x * b->x + a->y * b->y;
 }
 
-/* Chinese and Japanese text is written without spaces between words
- * (Korean uses spaces, so Hangul, including halfwidth Hangul, is not
- * included). */
-static int is_cjk(int c)
+/* Scripts written without spaces between words: Chinese, Japanese, Thai,
+ * Lao, Tibetan, Myanmar, Khmer and Yi. Korean uses spaces, so no Hangul form
+ * (syllables, jamo, circled, parenthesized or halfwidth) is included. */
+static int is_unspaced_script(int c)
 {
 	if ((c >= 0x3130 && c <= 0x318F) || /* hangul compatibility jamo */
 		(c >= 0x3200 && c <= 0x321E) || /* parenthesized hangul */
 		(c >= 0x3260 && c <= 0x327E)) /* circled hangul */
 		return 0;
-	return (c >= 0x2E80 && c <= 0x9FFF) || /* radicals, punctuation, kana, ideographs */
+	return (c >= 0x0E00 && c <= 0x0EFF) || /* thai, lao */
+		(c >= 0x0F00 && c <= 0x0FFF) || /* tibetan */
+		(c >= 0x1000 && c <= 0x109F) || /* myanmar */
+		(c >= 0x1780 && c <= 0x17FF) || /* khmer */
+		(c >= 0x19E0 && c <= 0x19FF) || /* khmer symbols */
+		(c >= 0x2E80 && c <= 0x9FFF) || /* radicals, punctuation, kana, ideographs */
+		(c >= 0xA000 && c <= 0xA4CF) || /* yi */
+		(c >= 0xA9E0 && c <= 0xA9FF) || /* myanmar extended-b */
+		(c >= 0xAA60 && c <= 0xAA7F) || /* myanmar extended-a */
 		(c >= 0xF900 && c <= 0xFAFF) || /* compatibility ideographs */
 		(c >= 0xFF00 && c <= 0xFF9F) || /* fullwidth forms, halfwidth katakana */
 		(c >= 0xFFE0 && c <= 0xFFEF) || /* fullwidth signs */
+		(c >= 0x1B000 && c <= 0x1B16F) || /* kana supplement and extensions */
 		(c >= 0x20000 && c <= 0x3FFFF); /* supplementary ideographs */
 }
 
-/* Punctuation that attaches to the preceding text: closing brackets and
- * final quotes in any script, and sentence punctuation. ASCII quotes can open
- * or close, so they are included too: no space is added before them. */
-static int is_closing_punct(int c)
+/* Characters no space is added before: punctuation that attaches to the
+ * preceding text in any script, every quote, and the CJK small and vertical
+ * form blocks (whole blocks, including their few brackets and symbols; they
+ * only occur in CJK text, which is not spaced anyway). Whether a quote opens
+ * or closes depends on the language (German closes with “, Danish opens
+ * with »), so quotes are never preceded by an added space. */
+static int no_space_before(int c)
 {
-	int cat;
 	if (c < 128)
 		return c != 0 && strchr(")]},.;:!?'\"", c) != NULL;
-	if (c == 0x2026) /* horizontal ellipsis */
+	switch (c)
+	{
+	case 0x00AB: case 0x00BB: /* « » */
+	case 0x2039: case 0x203A: /* ‹ › */
+	case 0x2026: /* … */
+	case 0x037E: case 0x0387: /* greek question mark, ano teleia */
+	case 0x0589: /* armenian full stop */
+	case 0x060C: case 0x061B: case 0x061F: /* arabic comma, semicolon, question mark */
+	case 0x06D4: /* arabic full stop */
+	case 0x0964: case 0x0965: /* devanagari danda, double danda */
+	case 0x104A: case 0x104B: /* myanmar section marks */
 		return 1;
-	cat = ucdn_get_general_category(c);
-	return cat == UCDN_GENERAL_CATEGORY_PE || cat == UCDN_GENERAL_CATEGORY_PF;
+	}
+	if ((c >= 0x2018 && c <= 0x201F) || /* curly and low quotes */
+		(c >= 0x1361 && c <= 0x1368) || /* ethiopic punctuation */
+		(c >= 0xFE10 && c <= 0xFE19) || /* vertical forms */
+		(c >= 0xFE30 && c <= 0xFE6F)) /* cjk compatibility and small forms (whole blocks) */
+		return 1;
+	switch (ucdn_get_general_category(c))
+	{
+	case UCDN_GENERAL_CATEGORY_PE: /* closing brackets */
+	case UCDN_GENERAL_CATEGORY_PF: /* final quotes */
+		return 1;
+	}
+	return 0;
 }
 
 static int may_add_space(int lastchar, int c, int flags)
@@ -601,9 +633,9 @@ static int may_add_space(int lastchar, int c, int flags)
 		return 1;
 	/* Optionally also symbols: letterlike symbols through miscellaneous
 	 * symbols and arrows (math operators, arrows, geometric shapes,
-	 * dingbats), and mathematical alphanumerics; never before CJK text or
-	 * closing punctuation. */
-	if ((flags & FZ_STEXT_SPACE_AFTER_SYMBOLS) && !is_cjk(c) && !is_closing_punct(c))
+	 * dingbats), and mathematical alphanumerics; never before text in a
+	 * script written without spaces, attached punctuation, or a quote. */
+	if ((flags & FZ_STEXT_SPACE_AFTER_SYMBOLS) && !is_unspaced_script(c) && !no_space_before(c))
 		return (lastchar >= 0x2100 && lastchar <= 0x2BFF) || (lastchar >= 0x1D400 && lastchar <= 0x1D7FF);
 	return 0;
 }
