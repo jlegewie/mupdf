@@ -162,11 +162,12 @@ typedef struct
 	unsigned int embed : 1;
 	unsigned int never_embed : 1;
 
-	/* Set by the PDF loader for embedded simple fonts, recording where
-	 * their unicode values come from. Only such fonts are eligible for
+	/* Set by the PDF loader for embedded fonts, recording where their
+	 * unicode values come from. Only such fonts are eligible for
 	 * known-outline recovery (see fz_known_glyph_outline_override). */
-	unsigned int unicode_from_glyph_names : 1; /* no ToUnicode CMap */
-	unsigned int unicode_from_tounicode : 1; /* has a ToUnicode CMap */
+	unsigned int unicode_from_glyph_names : 1; /* simple font, no ToUnicode CMap */
+	unsigned int unicode_from_tounicode : 1; /* simple font, has a ToUnicode CMap */
+	unsigned int unicode_from_cid_font : 1; /* CID font */
 } fz_font_flags_t;
 
 /**
@@ -858,8 +859,13 @@ int fz_known_glyph_outline_unicode(fz_context *ctx, fz_font *font, int gid);
 	character: the mapping came from glyph names, which symbol fonts get
 	wrong.
 
+	For an embedded CID font, and for any font when the table gives a
+	sequence of characters, the table only replaces values that cannot be
+	right: U+FFFD, a control character or a Private Use Area value.
+
 	For an embedded simple font with a ToUnicode CMap, the table only
-	overrides values that cannot be right: U+FFFD or a control character;
+	overrides values that cannot be right: U+FFFD, a control character or
+	a Private Use Area value;
 	a Latin-1 letter or vulgar fraction (U+00A0-U+00FF) where the table
 	says the outline is not a letter (Elsevier's ToUnicode maps its "(" to
 	"ð" and "=" to "¼"); or an ASCII letter or digit where the table says
@@ -870,6 +876,55 @@ int fz_known_glyph_outline_unicode(fz_context *ctx, fz_font *font, int gid);
 	Returns the character to use; current if there is no override.
 */
 int fz_known_glyph_outline_override(fz_context *ctx, fz_font *font, int gid, int current);
+
+/**
+	Values returned by the known-outline functions at or above this base
+	stand for a sequence of characters (a ligature with no code point of its
+	own, such as "tt" or "ti"); fz_known_glyph_outline_sequence converts one
+	to its UTF-8 text.
+*/
+#define FZ_KNOWN_OUTLINE_SEQUENCE 0x110000
+
+/**
+	Return the UTF-8 text of a sequence value (see
+	FZ_KNOWN_OUTLINE_SEQUENCE), or NULL for any other value.
+*/
+const char *fz_known_glyph_outline_sequence(int value);
+
+/**
+	Map a Symbol-font Private Use Area value to the character it stands for.
+
+	Word and other producers map the glyphs of Symbol-layout fonts (Symbol,
+	SymbolMT, Euclid Symbol, ...) to U+F020-U+F0FF: the font's
+	character code plus 0xF000, from its Microsoft symbol cmap. For a font
+	whose name says it is a Symbol-layout font, such a value is translated
+	through the Adobe Symbol encoding (U+F0B1 is plus-minus, U+F0B7 a bullet,
+	U+F061 alpha). Codes the encoding leaves undefined, and every value
+	outside U+F020-U+F0FF, are returned unchanged.
+*/
+int fz_symbol_font_private_use_unicode(fz_context *ctx, fz_font *font, int current);
+
+/**
+	Repair a value that cannot be right (U+FFFD, a control character or a
+	Private Use Area value) from the glyph's own name, for an embedded
+	simple font. (Glyph names in CID fonts are rare and often arbitrary.)
+
+	The name is decoded like the Adobe Glyph List specification describes,
+	but only exact forms are accepted: a suffix after "." is dropped
+	("a.sc", "one.osf"), components are split at "_" ("f_i", "t_t"), and each
+	component must be an Adobe Glyph List name or "uniXXXX"/"uXXXX[XX]".
+	Adobe Corporate Use values of list names become the character they are
+	a variant of ("Asmall" is a small capital a, "oneoldstyle" a 1,
+	"bracketleftex" a bracket piece). A Private Use value from a ToUnicode
+	CMap is only repaired when the name stands for that same value. A name of a plain ASCII letter or
+	digit is not used: symbol fonts give their glyphs such names, and a font
+	of plain letters without Unicode is an unmapped text layer, which is
+	recovered or OCRed as a whole.
+
+	Writes up to max characters to out and returns their number, or 0 when
+	the name gives no repair.
+*/
+int fz_glyph_name_repair_unicode(fz_context *ctx, fz_font *font, int gid, int current, int *out, int max);
 
 void fz_ft_lock(fz_context *ctx);
 

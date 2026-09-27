@@ -176,6 +176,8 @@ const char *fz_stext_options_usage =
 	"\tuse-gid-for-unknown-unicode: use glyph index if unicode mapping fails\n"
 	"\tuse-glyph-name-for-unknown-unicode: decode numeric \"C<n>\" glyph names if unicode mapping fails\n"
 	"\tuse-known-glyph-outlines: replace wrong unicode with the character a known symbol outline draws\n"
+	"\tmap-symbol-private-use: translate Symbol-font Private Use Area values through the Symbol encoding\n"
+	"\tuse-glyph-name-for-garbage: repair U+FFFD, control and Private Use values from exact glyph names\n"
 	"\tspace-after-symbols: allow word gaps after math, arrow, shape and dingbat symbols\n"
 	"\taccurate-bboxes: calculate char bboxes from the outlines\n"
 	"\taccurate-ascenders: calculate ascender/descender from font glyphs\n"
@@ -1194,7 +1196,8 @@ do_extract(fz_context *ctx, fz_stext_device *dev, fz_text_span *span, fz_matrix 
 	fz_matrix tm = span->trm;
 	float adv;
 	int unicode;
-	int i;
+	int runes[8];
+	int i, n;
 
 	for (i = start; i < end; i++)
 	{
@@ -1230,8 +1233,39 @@ do_extract(fz_context *ctx, fz_stext_device *dev, fz_text_span *span, fz_matrix 
 			adv = 0;
 
 		unicode = span->items[i].ucs;
+		if ((dev->flags & FZ_STEXT_MAP_SYMBOL_PRIVATE_USE) && !confirmed)
+			unicode = fz_symbol_font_private_use_unicode(ctx, font, unicode);
 		if ((dev->flags & FZ_STEXT_USE_KNOWN_GLYPH_OUTLINES) && !confirmed)
 			unicode = fz_known_glyph_outline_override(ctx, font, span->items[i].gid, unicode);
+		if (unicode >= FZ_KNOWN_OUTLINE_SEQUENCE)
+		{
+			const char *seq = fz_known_glyph_outline_sequence(unicode);
+			n = 0;
+			while (seq && *seq && n < (int)nelem(runes))
+				seq += fz_chartorune(&runes[n++], seq);
+		}
+		else if ((dev->flags & FZ_STEXT_USE_GLYPH_NAME_FOR_GARBAGE) && !confirmed)
+			n = fz_glyph_name_repair_unicode(ctx, font, span->items[i].gid, unicode, runes, nelem(runes));
+		else
+			n = 0;
+		if (n > 0)
+		{
+			/* Several characters for one glyph (a ligature without a code
+			 * point of its own): the first takes the glyph and its advance,
+			 * the rest follow with no width, as for expanded U+FB0x
+			 * ligatures. */
+			int k;
+			for (k = 0; k < n; k++)
+				fz_add_stext_char(ctx, dev, font, runes[k],
+					k == 0 ? span->items[i].gid : -1,
+					dev->last.trm,
+					k == 0 ? adv : 0,
+					dev->last.wmode,
+					dev->last.bidi_level,
+					k == 0 && (i == 0) && (dev->flags & FZ_STEXT_PRESERVE_SPANS),
+					flags);
+			continue;
+		}
 		if (unicode == FZ_REPLACEMENT_CHARACTER)
 		{
 			int named = FZ_REPLACEMENT_CHARACTER;
@@ -2181,6 +2215,10 @@ fz_parse_stext_options(fz_context *ctx, fz_stext_options *opts, const char *stri
 		opts->flags |= FZ_STEXT_USE_KNOWN_GLYPH_OUTLINES;
 	if (fz_has_option(ctx, string, "space-after-symbols", &val) && fz_option_eq(val, "yes"))
 		opts->flags |= FZ_STEXT_SPACE_AFTER_SYMBOLS;
+	if (fz_has_option(ctx, string, "map-symbol-private-use", &val) && fz_option_eq(val, "yes"))
+		opts->flags |= FZ_STEXT_MAP_SYMBOL_PRIVATE_USE;
+	if (fz_has_option(ctx, string, "use-glyph-name-for-garbage", &val) && fz_option_eq(val, "yes"))
+		opts->flags |= FZ_STEXT_USE_GLYPH_NAME_FOR_GARBAGE;
 	if (fz_has_option(ctx, string, "accurate-bboxes", &val) && fz_option_eq(val, "yes"))
 		opts->flags |= FZ_STEXT_ACCURATE_BBOXES;
 	if (fz_has_option(ctx, string, "vectors", &val) && fz_option_eq(val, "yes"))

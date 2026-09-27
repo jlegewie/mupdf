@@ -53,6 +53,36 @@ directory of PDFs.
    (`<idx> a`, `<idx> r <note>`, `<idx> = <char> <note>`).
 6. `emit_table.py review.json <table.h>`.
 
+Labels may be several letters for a ligature. `emit_table.py` stores
+`ff fi fl ffi ffl st` as their U+FB0x code points, which MuPDF expands unless
+ligatures are preserved, and any other ligature (`tt`, `ti`, `ft`) as a
+sequence in `fz_known_glyph_outline_sequences`.
+
+### Garbage in any font (round 8)
+
+Values that cannot be right (U+FFFD, controls, Private Use Area) in fonts
+with a ToUnicode CMap and in CID fonts:
+
+1. `trace_garbage.py <corpus> <trace.jsonl>`: like `trace_all.py`, but for every
+   embedded font including CID fonts, with multi-character ToUnicode values
+   (ligature consensus) and word contexts of garbage glyphs.
+2. `propose_garbage.py <trace.jsonl> review.json refs.npz <candidates.jsonl>`:
+   labels from consensus, a dictionary vote over word contexts (ligatures) or
+   the classifier. It leaves out documents that are mostly garbage
+   (unmapped text layers), Symbol-font U+F020-U+F0FF (`map-symbol-private-use`)
+   and glyphs whose names `use-glyph-name-for-garbage` already repairs
+   (`namerepair.py` mirrors that C function; keep them in sync). U+FFFD and
+   controls are only proposed for symbols and ligatures, never a plain
+   letter or digit (see the review rules).
+3. `sheets_ctx.py <candidates.jsonl> <outdir>`: contact sheets that show the
+   glyph name and word contexts, then `record.py` and `emit_table.py` as
+   above.
+
+The fixed tables behind the two name-based options are generated too:
+`emit_symbol_encoding.py <mupdf root> <out.h>` (Adobe Symbol encoding, needs
+`pypdf`, `fonttools`, `freetype-py`) and `emit_adobe_private_use.py <mupdf
+root> <out.h>` (Adobe Corporate Use values of glyph list names).
+
 Then rebuild, run `make fork-regression-test`, and compare extraction with and
 without the option on a corpus. Every changed character must be a table
 character.
@@ -67,7 +97,16 @@ Reject:
 - drawings that stand for more than one character: hyphen, minus or en dash;
   `l`, `I` or `|`; `O` or `0`; degree, ring accent or white bullet (settle these
   from text context when possible);
-- ligatures without a single code point (`ti`, `ft`, `ty`).
+- a plain letter or digit for a glyph that emits U+FFFD or a control
+  character: that is an unmapped text layer, recovered or OCRed as a whole
+  by callers that detect it by its U+FFFD;
+- icons with no Unicode character (ORCID, book), positional forms of Arabic
+  letters, and glyphs a producer maps to a Private Use value on purpose
+  (CNKI decorations).
+
+Small capitals and oldstyle figures at Private Use values are labelled with
+the lowercase letter and the digit (as `emit_adobe_private_use.py` does for
+Adobe's own values).
 
 Labels can be wrong even when they come from ToUnicode consensus, because some
 producers' ToUnicode maps are broken themselves (Elsevier maps `+` to `þ`).

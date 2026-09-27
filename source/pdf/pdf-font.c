@@ -1296,6 +1296,11 @@ load_cid_font(fz_context *ctx, pdf_document *doc, pdf_obj *dict, pdf_obj *encodi
 
 		pdf_load_to_unicode(ctx, doc, fontdesc, NULL, collection, to_unicode);
 
+		/* Embedded CID fonts are eligible for known-outline recovery of
+		 * values that cannot be right (U+FFFD, controls, Private Use). */
+		if (fontdesc->is_embedded)
+			fontdesc->font->flags.unicode_from_cid_font = 1;
+
 		/* If we have an identity encoding, we're supposed to use the glyph ids directly.
 		 * If we only have a substitute font, that won't work.
 		 * Make a last ditch attempt by using

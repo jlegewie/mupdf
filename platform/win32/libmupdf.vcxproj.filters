@@ -746,6 +746,12 @@
     <ClInclude Include="..\..\source\fitz\known-glyph-outlines-table.h">
       <Filter>fitz</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\fitz\symbol-encoding-table.h">
+      <Filter>fitz</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\fitz\adobe-private-use-table.h">
+      <Filter>fitz</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\source\fitz\paint-glyph.h">
       <Filter>fitz</Filter>
     </ClInclude>

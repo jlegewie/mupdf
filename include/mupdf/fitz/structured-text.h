@@ -199,12 +199,23 @@ typedef struct fz_stext_grid_positions fz_stext_grid_positions;
 	"C<n>" as a glyph-index name; it is checked before the CID/GID fallback.
 
 	FZ_STEXT_USE_KNOWN_GLYPH_OUTLINES: If this option is set, then for
-	embedded simple fonts, a glyph whose outline is in the table of known
+	embedded fonts, a glyph whose outline is in the table of known
 	glyph outlines is given the character the outline draws. This repairs
 	symbol fonts that draw Greek letters or math symbols in slots named for
 	Latin letters or punctuation. Without a ToUnicode CMap the table always
 	wins; with one, it only replaces values that cannot be right (see
 	fz_known_glyph_outline_override).
+
+	FZ_STEXT_MAP_SYMBOL_PRIVATE_USE: If this option is set, a Private Use
+	Area value U+F020-U+F0FF from a Symbol-layout font (Symbol, SymbolMT,
+	...) is translated through the Adobe Symbol encoding (see
+	fz_symbol_font_private_use_unicode).
+
+	FZ_STEXT_USE_GLYPH_NAME_FOR_GARBAGE: If this option is set, a value that
+	cannot be right (U+FFFD, a control character or a Private Use Area
+	value) from an embedded font is repaired from the glyph's own name when
+	that is an exact Adobe Glyph List form for a symbol, a ligature or a
+	letter variant (see fz_glyph_name_repair_unicode).
 
 	FZ_STEXT_SPACE_AFTER_SYMBOLS: By default, a word gap is only turned into
 	a space after Latin, Greek, Cyrillic, Hebrew, Arabic, punctuation and
@@ -242,6 +253,8 @@ enum
 	FZ_STEXT_USE_GLYPH_NAME_FOR_UNKNOWN_UNICODE = (1<<22),
 	FZ_STEXT_USE_KNOWN_GLYPH_OUTLINES = (1<<23),
 	FZ_STEXT_SPACE_AFTER_SYMBOLS = (1<<24),
+	FZ_STEXT_MAP_SYMBOL_PRIVATE_USE = (1<<25),
+	FZ_STEXT_USE_GLYPH_NAME_FOR_GARBAGE = (1<<26),
 
 	/* An old, deprecated option. */
 	FZ_STEXT_MEDIABOX_CLIP = FZ_STEXT_CLIP

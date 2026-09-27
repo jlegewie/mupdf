@@ -14,7 +14,9 @@ The `fork` branch is based on the upstream tag **1.27.2** and contains a small s
 | `source/pdf/pdf-repair.c` | (1) Bound the `endstream` scan so a corrupt stream with a missing terminator cannot swallow the objects that follow it; (2) rewind and resync — instead of aborting or skipping ahead — when a runaway dictionary/array parse consumes objects past its boundary |
 | `source/pdf/pdf-page.c` | Tolerate dangling/non-page kids in the page tree, and rebuild the page map if a mid-walk repair drops it, so a truncated PDF still yields the pages it does have |
 | `source/pdf/pdf-type3.c`, `source/fitz/font.c`, `include/mupdf/fitz/glyph-cache.h` | Deduplicate Type 3 `CharProcs`: load each distinct glyph stream once and share its display list across the many character codes an `/Encoding` maps onto it |
-| `source/fitz/known-glyph-outlines.c`, `source/fitz/known-glyph-outlines-table.h`, `source/fitz/stext-device.c`, `source/pdf/pdf-font.c`, `source/fitz/font.c`, `include/mupdf/fitz/font.h`, `include/mupdf/fitz/structured-text.h`, `platform/win32/libmupdf.vcxproj{,.filters}` | New `use-known-glyph-outlines` stext option (`FZ_STEXT_USE_KNOWN_GLYPH_OUTLINES`): for embedded simple fonts, a glyph whose outline hash is in a reviewed table gets the character the outline actually draws (always without a ToUnicode CMap; with one, only when the ToUnicode value cannot be right) |
+| `source/fitz/known-glyph-outlines.c`, `source/fitz/known-glyph-outlines-table.h`, `source/fitz/stext-device.c`, `source/pdf/pdf-font.c`, `source/fitz/font.c`, `include/mupdf/fitz/font.h`, `include/mupdf/fitz/structured-text.h`, `platform/win32/libmupdf.vcxproj{,.filters}` | New `use-known-glyph-outlines` stext option (`FZ_STEXT_USE_KNOWN_GLYPH_OUTLINES`): for embedded fonts, a glyph whose outline hash is in a reviewed table gets the character (or ligature letters) the outline actually draws (for simple fonts without a ToUnicode CMap always; otherwise only when the current value cannot be right) |
+| `source/fitz/known-glyph-outlines.c`, `source/fitz/symbol-encoding-table.h`, `source/fitz/stext-device.c`, `include/mupdf/fitz/font.h`, `include/mupdf/fitz/structured-text.h` | New `map-symbol-private-use` stext option (`FZ_STEXT_MAP_SYMBOL_PRIVATE_USE`): U+F020-U+F0FF from a Symbol-layout font is translated through the Adobe Symbol encoding |
+| `source/fitz/known-glyph-outlines.c`, `source/fitz/adobe-private-use-table.h`, `source/fitz/stext-device.c`, `include/mupdf/fitz/font.h`, `include/mupdf/fitz/structured-text.h` | New `use-glyph-name-for-garbage` stext option (`FZ_STEXT_USE_GLYPH_NAME_FOR_GARBAGE`): U+FFFD, control and Private Use values from embedded simple fonts are repaired from exact Adobe Glyph List glyph names |
 | `source/fitz/stext-device.c`, `include/mupdf/fitz/structured-text.h` | New `space-after-symbols` stext option (`FZ_STEXT_SPACE_AFTER_SYMBOLS`): word gaps after math, arrow, shape and dingbat symbols become spaces |
 | `FORK.md` | This file |
 
@@ -72,15 +74,22 @@ drawn:
 - The key is the outline, not the font name. Identical outlines are identical
   drawings, so the table covers renamed subsets and font-name variants, and a
   font name reused for different glyphs cannot trigger a false remap.
-- Only embedded simple fonts are eligible; `pdf_load_simple_font` records
-  whether their unicode comes from glyph names
+- Only embedded fonts are eligible; `pdf_load_simple_font` records
+  whether a simple font's unicode comes from glyph names
   (`fz_font_flags_t.unicode_from_glyph_names`) or from a ToUnicode CMap
-  (`unicode_from_tounicode`). The policy lives in
+  (`unicode_from_tounicode`), and `load_cid_font` marks embedded CID fonts
+  (`unicode_from_cid_font`). The policy lives in
   `fz_known_glyph_outline_override`:
   - Without a ToUnicode CMap the table always wins; where the current
     character already matches it the override is a no-op.
+  - For a CID font the table only replaces values that cannot be right:
+    U+FFFD, a control character or a Private Use Area value (Word's Calibri
+    `ti` ligature has no ToUnicode entry; Elsevier's CID fonts map their
+    `fi`/`fl` ligatures to U+E103/U+E104).
   - With a ToUnicode CMap the table only replaces values that cannot be
-    right: U+FFFD or a control character; a Latin-1 letter or vulgar
+    right: U+FFFD, a control character or a Private Use Area value (the
+    value means nothing outside the font; Adobe Pro fonts map their
+    alternate figures to U+F639-U+F64C); a Latin-1 letter or vulgar
     fraction when the table says the outline is not a letter; or an ASCII
     letter or digit when the table says the outline is a symbol (Unicode
     category S*) or a Greek letter that looks unlike any Latin letter
@@ -108,6 +117,12 @@ drawn:
   device has matched against ActualText (an exact match, or the matching
   prefix/suffix `do_extract_within_actualtext` sends through `do_extract`)
   is never rewritten; with `ignore-actualtext` the recovery applies as usual.
+- An entry is a character, or a sequence of letters for a ligature that has
+  no code point of its own (`tt`, `ti`, `ft`): the first letter takes the
+  glyph and its advance, the rest follow with no width, as MuPDF does when
+  it expands U+FB00-U+FB06. Ligatures that have a code point are stored as
+  it, so `preserve-ligatures` keeps them. A sequence only replaces a value
+  that cannot be right.
 - Hashes are computed lazily per glyph and cached on the `fz_font`
   (`known_outline_ucs`); overhead is not measurable on extraction benchmarks.
 - The table is generated by `scripts/known-glyph-outlines/` (see its README;
@@ -132,15 +147,81 @@ mutool run /tmp/check.js sample.pdf   # 20 mg of NP-Ova / 20 μg of NP-Ova
 `fork-regressions/data/known-glyph-outlines/sample.pdf` (no ToUnicode: `20 mg`
 → `20 μg`), `tounicode-sample.pdf` (broken ToUnicode: `Nc ¼ N` →
 `Nc = N −Nt`), `ascii-tounicode-sample.pdf` (ToUnicode `X` → `∑`),
-`accent-sample.pdf` (a spacing acute accent stays an accent) and
-`actualtext-sample.pdf` (ActualText-confirmed `m` stays `m`), and
-`space-after-symbols` on `tounicode-sample.pdf` (`N −Nt` → `N − Nt`).
+`accent-sample.pdf` (a spacing acute accent stays an accent),
+`actualtext-sample.pdf` (ActualText-confirmed `m` stays `m`),
+`cid-pua-sample.pdf` (CID font, Private Use ligatures: `\uE103rst` →
+`first`) and `ligature-sequence-sample.pdf` (Calibri `collabora�ve` →
+`collaborative`, the `i` with no width), and `space-after-symbols` on
+`tounicode-sample.pdf` (`N −Nt` → `N − Nt`).
 
 No upstream MuPDF mechanism covers this (checked against 1.27.2 and upstream
 `master` as of 2026-09-23): the glyph-name heuristics (`C<n>` here, `gXXXX` and
 `Gxx` upstream) only apply to names that are otherwise unknown, the
 `Symbol`/`ZapfDingbats` handling only affects substitution of non-embedded
 fonts, and nothing compares glyph outlines with their mapped characters.
+
+## Why the map-symbol-private-use option exists
+
+Word, and other producers that go through the Windows font stack, reach the
+glyphs of a Symbol-layout font through its Microsoft symbol cmap, which
+places character code `c` at U+F000 + `c`, and write that value into the
+ToUnicode CMap. The Private Use Area value means nothing outside the font,
+so `fold-change ±1` extracts as `fold-change \uF0B11` and a bullet list as
+`\uF0B7` items. Poppler and PDF.js produce the same values.
+
+The opt-in `map-symbol-private-use` option (`FZ_STEXT_MAP_SYMBOL_PRIVATE_USE`,
+`fz_symbol_font_private_use_unicode`) translates U+F020-U+F0FF through the
+Adobe Symbol encoding when the font's name contains `symbol` (Symbol,
+SymbolMT, Symbol Greek, Euclid Symbol, MT Symbol, SymbolProportionalBT, ...;
+in a 10k-PDF corpus every such font that emits U+F020-U+F0FF follows the
+Symbol layout). Codes the encoding leaves undefined stay unchanged. Adobe's
+own private-use values in the encoding (serif and sans ©, ®, ™, extensible
+bracket and arrow pieces) are given their standard Unicode characters, as in
+Apple's SYMBOL.TXT. The table is `symbol-encoding-table.h`, generated by
+`scripts/known-glyph-outlines/emit_symbol_encoding.py` from Adobe's
+symbol.txt and checked against the glyph names of the bundled URW Standard
+Symbols font.
+
+Other dingbat fonts (Wingdings, Webdings, MT Extra) have their own layouts;
+their common glyphs are in the known-outline table instead.
+
+`make fork-regression-test` asserts `fold-change \uF0B11` → `fold-change ±1`
+on `fork-regressions/data/known-glyph-outlines/symbol-pua-sample.pdf`.
+
+## Why the use-glyph-name-for-garbage option exists
+
+Many glyphs that extract as U+FFFD or a Private Use Area value carry an exact
+name: a ToUnicode CMap without an entry for `copyright` or `parenright`,
+Adobe small capitals (`Asmall`) and oldstyle figures (`oneoldstyle`), whose
+Adobe Glyph List values are Adobe's own Corporate Use code points, TeX
+bracket pieces (`bracketleftex`), ligatures named `f_i`. The opt-in
+`use-glyph-name-for-garbage` option (`FZ_STEXT_USE_GLYPH_NAME_FOR_GARBAGE`,
+`fz_glyph_name_repair_unicode`) repairs such values from the glyph's name,
+for embedded simple fonts only (glyph names in CID fonts are rare and often
+arbitrary). The name is read like the Adobe Glyph List specification
+describes, but only exact forms are accepted:
+
+- a suffix after `.` is dropped (`a.sc`, `one.osf`), components are split at
+  `_`, and each must be an Adobe Glyph List name or `uniXXXX`/`uXXXX[XX]`;
+  the looser guesses of `fz_unicode_from_glyph_name` (`g123`, `C45`) are
+  not used;
+- an Adobe Corporate Use value of a list name becomes the character it is a
+  variant of (`adobe-private-use-table.h`, generated by
+  `emit_adobe_private_use.py`): small capitals the lowercase letter, figures
+  the digit, pieces the Unicode bracket pieces. A `uniF761` name only
+  repeats the private-use value, which an icon font may use for anything,
+  so it is not folded;
+- a name of a plain ASCII letter or digit (`a`, `one`) is not used: symbol
+  fonts give their glyphs such names, and a font of plain letters without
+  Unicode is an unmapped text layer, which callers detect by its U+FFFD and
+  recover or OCR as a whole;
+- a Private Use value from a ToUnicode CMap is only replaced when the name
+  stands for that same value (`Asmall` for U+F761): CNKI fonts map a dash to
+  U+E5D0 on purpose and name it `parenright`.
+
+`make fork-regression-test` asserts `C\uF768\uF769\uF761\uF770\uF770\uF765` →
+`Chiappe` on `glyph-name-sample.pdf`, and that the CNKI dash in
+`tounicode-pua-sample.pdf` is kept with all three repair options on.
 
 ## Why the space-after-symbols option exists
 

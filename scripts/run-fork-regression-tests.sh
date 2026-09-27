@@ -242,3 +242,121 @@ print("OK: known-glyph-outline keeps spacing accents");
 JS
 	"$MUTOOL" run "$script" "$ACCENT_SAMPLE"
 fi
+
+# Same option, CID font whose ToUnicode maps its fi/fl ligatures to Private Use
+# values (Elsevier "AdvOT" fonts). PUA counts as a value that cannot be right,
+# so the table's U+FB01/U+FB02 apply and expand to letters.
+CIDPUA_SAMPLE="$CORPUS_DIR/known-glyph-outlines/cid-pua-sample.pdf"
+if [[ -f "$CIDPUA_SAMPLE" ]]; then
+	printf '==> known-glyph-outline CID Private Use assertion (%s)\n' "${CIDPUA_SAMPLE#"$ROOT"/}"
+	script="$(mktemp -t knownoutlinecidpua.XXXXXX.js)"
+	tmp_scripts+=("$script")
+	cat > "$script" <<'JS'
+var page = Document.openDocument(scriptArgs[0]).loadPage(0);
+var off = page.toStructuredText("preserve-whitespace").asText();
+var on = page.toStructuredText("preserve-whitespace,use-known-glyph-outlines").asText();
+if (off.indexOf("rst identied") < 0)
+	throw new Error("FAIL: option OFF should keep the Private Use ligatures");
+if (on.indexOf("first identified") < 0 || on.indexOf("inflammatory") < 0)
+	throw new Error("FAIL: option ON should expand the fi and fl ligatures");
+if (/[-]/.test(on))
+	throw new Error("FAIL: option ON should leave no Private Use values");
+print("OK: known-glyph-outline repairs CID Private Use ligatures");
+JS
+	"$MUTOOL" run "$script" "$CIDPUA_SAMPLE"
+fi
+
+# Same option, table entry for a ligature without a code point: Word's Calibri
+# "ti" glyph has no ToUnicode entry (U+FFFD); the table gives the sequence "ti".
+# The first letter takes the glyph's box, the second has no width.
+SEQ_SAMPLE="$CORPUS_DIR/known-glyph-outlines/ligature-sequence-sample.pdf"
+if [[ -f "$SEQ_SAMPLE" ]]; then
+	printf '==> known-glyph-outline ligature sequence assertion (%s)\n' "${SEQ_SAMPLE#"$ROOT"/}"
+	script="$(mktemp -t knownoutlineseq.XXXXXX.js)"
+	tmp_scripts+=("$script")
+	cat > "$script" <<'JS'
+var page = Document.openDocument(scriptArgs[0]).loadPage(0);
+var off = page.toStructuredText("preserve-whitespace").asText();
+var on = page.toStructuredText("preserve-whitespace,use-known-glyph-outlines").asText();
+if (off.indexOf("collabora�ve") < 0)
+	throw new Error("FAIL: option OFF should keep U+FFFD for the ti ligature");
+if (on.indexOf("with collaborative elements") < 0)
+	throw new Error("FAIL: option ON should give the ti ligature as two letters");
+var widths = [];
+page.toStructuredText("preserve-whitespace,use-known-glyph-outlines").walk({
+	onChar: function (c, origin, font, size, quad) { widths.push([c, quad[2] - quad[0]]); }
+});
+var text = widths.map(function (w) { return w[0]; }).join("");
+var k = text.indexOf("collaborative");
+if (k < 0 || !(widths[k + 9][1] > 0) || widths[k + 10][1] != 0)
+	throw new Error("FAIL: t of the sequence should take the glyph box, i should have no width");
+print("OK: known-glyph-outline expands a ligature sequence");
+JS
+	"$MUTOOL" run "$script" "$SEQ_SAMPLE"
+fi
+
+# `map-symbol-private-use`: Word maps SymbolMT (a CID font here) to U+F020-U+F0FF
+# in its ToUnicode. The Symbol encoding gives the character (U+F0B1 is ±).
+SYMPUA_SAMPLE="$CORPUS_DIR/known-glyph-outlines/symbol-pua-sample.pdf"
+if [[ -f "$SYMPUA_SAMPLE" ]]; then
+	printf '==> map-symbol-private-use assertion (%s)\n' "${SYMPUA_SAMPLE#"$ROOT"/}"
+	script="$(mktemp -t symbolpua.XXXXXX.js)"
+	tmp_scripts+=("$script")
+	cat > "$script" <<'JS'
+var page = Document.openDocument(scriptArgs[0]).loadPage(0);
+var off = page.toStructuredText("preserve-whitespace").asText();
+var on = page.toStructuredText("preserve-whitespace,map-symbol-private-use").asText();
+if (off.indexOf("fold-change 1") < 0)
+	throw new Error("FAIL: option OFF should keep U+F0B1");
+if (on.indexOf("fold-change ±1") < 0)
+	throw new Error("FAIL: option ON should map U+F0B1 to plus-minus");
+if (on.length != off.length)
+	throw new Error("FAIL: option ON should only replace characters");
+print("OK: map-symbol-private-use off=upstream on=mapped");
+JS
+	"$MUTOOL" run "$script" "$SYMPUA_SAMPLE"
+fi
+
+# `use-glyph-name-for-garbage`: Adobe small capitals ("Hsmall") get Adobe's
+# Private Use values from the glyph list; the glyph name gives the letter.
+NAME_SAMPLE="$CORPUS_DIR/known-glyph-outlines/glyph-name-sample.pdf"
+if [[ -f "$NAME_SAMPLE" ]]; then
+	printf '==> use-glyph-name-for-garbage assertion (%s)\n' "${NAME_SAMPLE#"$ROOT"/}"
+	script="$(mktemp -t glyphnamegarbage.XXXXXX.js)"
+	tmp_scripts+=("$script")
+	cat > "$script" <<'JS'
+var page = Document.openDocument(scriptArgs[0]).loadPage(0);
+var off = page.toStructuredText("preserve-whitespace").asText();
+var on = page.toStructuredText("preserve-whitespace,use-glyph-name-for-garbage").asText();
+if (off.indexOf("C, L. M.") < 0)
+	throw new Error("FAIL: option OFF should keep the small-capital Private Use values");
+if (on.indexOf("Chiappe, L. M.") < 0)
+	throw new Error("FAIL: option ON should read small capitals as letters");
+if (/[-]/.test(on))
+	throw new Error("FAIL: option ON should leave no Private Use values");
+print("OK: use-glyph-name-for-garbage off=upstream on=repaired");
+JS
+	"$MUTOOL" run "$script" "$NAME_SAMPLE"
+fi
+
+# Negative case for both new options: a CNKI font whose ToUnicode maps a
+# dash to U+E5D0 on purpose, while the glyph is named "parenright". Neither the
+# name nor the Symbol mapping may overrule such a Private Use value.
+TUPUA_SAMPLE="$CORPUS_DIR/known-glyph-outlines/tounicode-pua-sample.pdf"
+if [[ -f "$TUPUA_SAMPLE" ]]; then
+	printf '==> ToUnicode Private Use kept assertion (%s)\n' "${TUPUA_SAMPLE#"$ROOT"/}"
+	script="$(mktemp -t tounicodepua.XXXXXX.js)"
+	tmp_scripts+=("$script")
+	cat > "$script" <<'JS'
+var page = Document.openDocument(scriptArgs[0]).loadPage(0);
+var all = "preserve-whitespace,use-known-glyph-outlines,map-symbol-private-use,use-glyph-name-for-garbage";
+var off = page.toStructuredText("preserve-whitespace").asText();
+var on = page.toStructuredText(all).asText();
+if (off.indexOf("") < 0)
+	throw new Error("FAIL: expected U+E5D0 leader glyphs in the sample");
+if (on != off)
+	throw new Error("FAIL: a ToUnicode Private Use value with a disagreeing glyph name must be kept");
+print("OK: ToUnicode Private Use value kept against a disagreeing glyph name");
+JS
+	"$MUTOOL" run "$script" "$TUPUA_SAMPLE"
+fi

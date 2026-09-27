@@ -38,6 +38,17 @@
 
 	Glyphs with no points are never hashed. The table generator must use the
 	same definition.
+
+	An entry's value is a character, or FZ_KNOWN_OUTLINE_SEQUENCE + n for
+	the n-th string in fz_known_glyph_outline_sequences: a ligature with no
+	code point of its own ("tt", "ti"). Ligatures that have one (U+FB00-FB06)
+	are stored as that character; the stext device expands them into letters
+	unless ligatures are preserved.
+
+	This file also holds two repairs that need no outline: the Symbol-font
+	Private Use Area mapping (fz_symbol_font_private_use_unicode), where the
+	font name identifies the encoding, and the glyph-name repair
+	(fz_glyph_name_repair_unicode), where the glyph's own name does.
 */
 
 #include "mupdf/fitz.h"
@@ -53,6 +64,21 @@ typedef struct
 } known_glyph_outline;
 
 #include "known-glyph-outlines-table.h"
+#include "symbol-encoding-table.h"
+#include "adobe-private-use-table.h"
+
+#include <string.h>
+
+const char *
+fz_known_glyph_outline_sequence(int value)
+{
+	if (value < FZ_KNOWN_OUTLINE_SEQUENCE)
+		return NULL;
+	value -= FZ_KNOWN_OUTLINE_SEQUENCE;
+	if (value >= (int)nelem(fz_known_glyph_outline_sequences) || !fz_known_glyph_outline_sequences[value])
+		return NULL;
+	return fz_known_glyph_outline_sequences[value];
+}
 
 static uint64_t
 fnv1a_int32(uint64_t h, int32_t v)
@@ -149,6 +175,8 @@ fz_known_glyph_outline_unicode(fz_context *ctx, fz_font *font, int gid)
 static int
 is_letter(int c)
 {
+	if (c >= FZ_KNOWN_OUTLINE_SEQUENCE)
+		return 1;
 	switch (ucdn_get_general_category(c))
 	{
 	case UCDN_GENERAL_CATEGORY_LL:
@@ -161,11 +189,15 @@ is_letter(int c)
 	return 0;
 }
 
-/* A value no correct ToUnicode entry produces for a drawn glyph. */
+/* A value no correct ToUnicode entry produces for a drawn glyph. Private
+ * Use Area values are font-specific (Word's Symbol-font codes, Adobe
+ * alternate figures, publishers' ligature slots), so they carry no meaning
+ * outside the font either. */
 static int
 is_garbage_unicode(int c)
 {
-	return c == FZ_REPLACEMENT_CHARACTER || c < 32 || (c >= 127 && c < 160);
+	return c == FZ_REPLACEMENT_CHARACTER || c < 32 || (c >= 127 && c < 160) ||
+		(c >= 0xE000 && c <= 0xF8FF);
 }
 
 /* Latin-1 values that broken ToUnicode maps substitute for symbols. */
@@ -186,6 +218,8 @@ is_ascii_alnum(int c)
 static int
 is_symbol(int c)
 {
+	if (c >= FZ_KNOWN_OUTLINE_SEQUENCE)
+		return 0;
 	switch (ucdn_get_general_category(c))
 	{
 	case UCDN_GENERAL_CATEGORY_SC:
@@ -257,7 +291,11 @@ fz_known_glyph_outline_override(fz_context *ctx, fz_font *font, int gid, int cur
 
 	if (!font || gid < 0)
 		return current;
-	if (!font->flags.unicode_from_glyph_names && !font->flags.unicode_from_tounicode)
+	if (!font->flags.unicode_from_glyph_names && !font->flags.unicode_from_tounicode &&
+		!font->flags.unicode_from_cid_font)
+		return current;
+	/* CID fonts: only values that cannot be right. */
+	if (font->flags.unicode_from_cid_font && !is_garbage_unicode(current))
 		return current;
 	if (font->flags.unicode_from_tounicode &&
 		!is_garbage_unicode(current) && !is_suspicious_latin1(current) && !is_ascii_alnum(current))
@@ -266,6 +304,10 @@ fz_known_glyph_outline_override(fz_context *ctx, fz_font *font, int gid, int cur
 	known = fz_known_glyph_outline_unicode(ctx, font, gid);
 	if (!known || known == current)
 		return current;
+	/* A sequence (a ligature such as "tt") only replaces garbage: a single
+	 * letter from the font's own mapping may be right. */
+	if (known >= FZ_KNOWN_OUTLINE_SEQUENCE)
+		return is_garbage_unicode(current) ? known : current;
 	if (is_spacing_accent(current) && is_accent_lookalike(known))
 		return current;
 
@@ -278,4 +320,162 @@ fz_known_glyph_outline_override(fz_context *ctx, fz_font *font, int gid, int cur
 	 * its summation to "X", a Symbol-layout font mapping mu to "m"): override
 	 * only with a symbol or a distinctly Greek letter. */
 	return (is_symbol(known) || is_distinct_greek(known)) ? known : current;
+}
+
+/* Symbol-layout fonts: Adobe's Symbol and its clones (SymbolMT, Symbol Greek,
+ * Euclid Symbol, MT Symbol, SymbolProportionalBT, OpenSymbol's Symbol
+ * range). Every font name in the test corpus that contains "symbol" and
+ * emits U+F020-U+F0FF follows this layout. */
+static int
+is_symbol_layout_font(fz_context *ctx, fz_font *font)
+{
+	const char *name = fz_font_name(ctx, font);
+	const char *p;
+
+	if (!name)
+		return 0;
+	for (p = name; *p; p++)
+		if (fz_strncasecmp(p, "symbol", 6) == 0)
+			return 1;
+	return 0;
+}
+
+int
+fz_symbol_font_private_use_unicode(fz_context *ctx, fz_font *font, int current)
+{
+	int u;
+
+	if (current < 0xF020 || current > 0xF0FF || !font)
+		return current;
+	if (!is_symbol_layout_font(ctx, font))
+		return current;
+	u = fz_symbol_encoding_unicode[current - 0xF020];
+	return u ? u : current;
+}
+
+static int
+adobe_private_use(int c)
+{
+	int l = 0;
+	int r = (int)nelem(fz_adobe_private_use) - 1;
+	while (l <= r)
+	{
+		int m = (l + r) >> 1;
+		if (c < fz_adobe_private_use[m].pua)
+			r = m - 1;
+		else if (c > fz_adobe_private_use[m].pua)
+			l = m + 1;
+		else
+			return fz_adobe_private_use[m].ucs;
+	}
+	return 0;
+}
+
+static int
+parse_hex(const char *s, int min, int max)
+{
+	int n = 0, v = 0;
+	for (; *s; s++, n++)
+	{
+		int d;
+		if (n == max)
+			return -1; /* too long; checked first so the value cannot overflow */
+		if (*s >= '0' && *s <= '9') d = *s - '0';
+		else if (*s >= 'A' && *s <= 'F') d = *s - 'A' + 10;
+		else return -1;
+		v = v * 16 + d;
+	}
+	return (n >= min && n <= max) ? v : -1;
+}
+
+/* One component of a glyph name: an Adobe Glyph List name, or "uniXXXX" /
+ * "uXXXX[XX]". Only exact forms count; the looser heuristics of
+ * fz_unicode_from_glyph_name ("g123", "C45", ...) are guesses. */
+static int
+glyph_name_component(const char *s, int *from_list)
+{
+	int u = fz_unicode_from_glyph_name_strict(s);
+	*from_list = 0;
+	if (u)
+	{
+		*from_list = 1;
+		return u;
+	}
+	if (!strncmp(s, "uni", 3))
+		u = parse_hex(s + 3, 4, 4);
+	else if (s[0] == 'u')
+		u = parse_hex(s + 1, 4, 6);
+	else
+		return 0;
+	return (u < 0 || (u >= 0xD800 && u <= 0xDFFF) || u > 0x10FFFF) ? 0 : u;
+}
+
+int
+fz_glyph_name_repair_unicode(fz_context *ctx, fz_font *font, int gid, int current, int *out, int max)
+{
+	char name[64];
+	char *p, *q, *dot;
+	int n = 0, suffixed, variant = 0, i;
+
+	if (!font || gid < 0 || !is_garbage_unicode(current))
+		return 0;
+	/* Simple fonts only: glyph names in CID fonts are rare and, where
+	 * present, often arbitrary (a CNKI font's dash is named "parenright"). */
+	if (!font->flags.unicode_from_glyph_names && !font->flags.unicode_from_tounicode)
+		return 0;
+
+	name[0] = 0;
+	fz_get_glyph_name(ctx, font, gid, name, sizeof name);
+	name[sizeof name - 1] = 0;
+	dot = strchr(name, '.');
+	suffixed = dot != NULL;
+	if (dot)
+		*dot = 0;
+	if (!name[0])
+		return 0;
+
+	for (p = name; p; p = q)
+	{
+		int u, from_list;
+		q = strchr(p, '_');
+		if (q)
+			*q++ = 0;
+		u = glyph_name_component(p, &from_list);
+		/* A ToUnicode CMap that gives a Private Use value on purpose is
+		 * only overruled by a name that means the same value ("Asmall" for
+		 * U+F761): CNKI fonts map a dash to U+E5D0 and name it
+		 * "parenright". */
+		if (font->flags.unicode_from_tounicode && current >= 0xE000 && current <= 0xF8FF &&
+			(u != current || q || n > 0))
+			return 0;
+		if (u >= 0xE000 && u <= 0xF8FF)
+		{
+			/* Adobe's Corporate Use values name a variant of a character
+			 * ("Asmall", "oneoldstyle"). A "uniF761" name only repeats the
+			 * private-use value, which an icon font may use for anything. */
+			if (!from_list)
+				return 0;
+			u = adobe_private_use(u);
+			variant = 1;
+		}
+		if (!u || is_garbage_unicode(u) || n == max)
+			return 0;
+		out[n++] = u;
+	}
+
+	if (n > 1)
+	{
+		/* Ligatures ("f_i", "t_t"): letters only. */
+		for (i = 0; i < n; i++)
+			if (!is_letter(out[i]))
+				return 0;
+		return n;
+	}
+	/* A plain letter or digit name ("a", "one") is the case where symbol
+	 * fonts lie, and a font of such glyphs without Unicode is an unmapped
+	 * text layer, which is recovered or OCRed as a whole. Only variants
+	 * ("a.sc", "one.osf", "Asmall") and other characters are repaired. */
+	if (is_ascii_alnum(out[0]) && !suffixed && !variant)
+		return 0;
+	return n;
 }

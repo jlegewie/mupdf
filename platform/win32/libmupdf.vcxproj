@@ -1389,6 +1389,8 @@
     <ClInclude Include="..\..\source\fitz\image-imp.h" />
     <ClInclude Include="..\..\source\fitz\jmemcust.h" />
     <ClInclude Include="..\..\source\fitz\known-glyph-outlines-table.h" />
+    <ClInclude Include="..\..\source\fitz\symbol-encoding-table.h" />
+    <ClInclude Include="..\..\source\fitz\adobe-private-use-table.h" />
     <ClInclude Include="..\..\source\fitz\paint-glyph.h" />
     <ClInclude Include="..\..\source\fitz\pixmap-imp.h" />
     <ClInclude Include="..\..\source\fitz\ucdn_db.h" />

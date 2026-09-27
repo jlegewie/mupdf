@@ -9144,5 +9144,2926 @@
   "font": "MathPackTen",
   "wrong_chars": 2,
   "decision": "accept"
+ },
+ "2a03b0f791de8105": {
+  "idx": 0,
+  "emit": 65533,
+  "proposed": ",",
+  "font": "B4+HGBZ_CNKI",
+  "wrong_chars": 4848,
+  "decision": "relabel",
+  "label": "，",
+  "note": "CNKI full-width comma in Chinese text"
+ },
+ "e7ebfe4ea04f5ab1": {
+  "idx": 1,
+  "emit": 63196,
+  "proposed": "1",
+  "font": "SvxbbtMinionPro-Regular",
+  "wrong_chars": 1856,
+  "decision": "accept"
+ },
+ "e28155bf2e56d58b": {
+  "idx": 2,
+  "emit": 65533,
+  "proposed": "·",
+  "font": "MnSymbol10",
+  "wrong_chars": 1305,
+  "decision": "reject",
+  "note": "MnSymbol small mark, ambiguous"
+ },
+ "64fe745d5333ecb8": {
+  "idx": 3,
+  "emit": 63034,
+  "proposed": "2",
+  "font": "SvxbbtMinionPro-Regular",
+  "wrong_chars": 1133,
+  "decision": "accept"
+ },
+ "912096e214eeba3b": {
+  "idx": 4,
+  "emit": 58828,
+  "proposed": "™",
+  "font": "DY6+ZEMKqo-10",
+  "wrong_chars": 974,
+  "decision": "reject",
+  "note": "CNKI double rule decoration"
+ },
+ "bf9239ba48d897f7": {
+  "idx": 5,
+  "emit": 57603,
+  "proposed": "ñ",
+  "font": "AdvOT999035f4+e1",
+  "wrong_chars": 933,
+  "decision": "relabel",
+  "label": "fi",
+  "note": "Elsevier AdvOT fi ligature"
+ },
+ "7c60d718d57636c3": {
+  "idx": 6,
+  "emit": 63033,
+  "proposed": "0",
+  "font": "SvxbbtMinionPro-Regular",
+  "wrong_chars": 923,
+  "decision": "accept"
+ },
+ "e49855e569df7644": {
+  "idx": 7,
+  "emit": 57601,
+  "proposed": "τ",
+  "font": "DanteMTPro+e1",
+  "wrong_chars": 855,
+  "decision": "relabel",
+  "label": "1",
+  "note": "DanteMTPro oldstyle one"
+ },
+ "1e0869dab1173bc2": {
+  "idx": 8,
+  "emit": 63041,
+  "proposed": "9",
+  "font": "SvxbbtMinionPro-Regular",
+  "wrong_chars": 796,
+  "decision": "accept"
+ },
+ "41fc848fe288641b": {
+  "idx": 9,
+  "emit": 65533,
+  "proposed": ".",
+  "font": "pxsys",
+  "wrong_chars": 796,
+  "decision": "reject",
+  "note": "brace extension piece"
+ },
+ "a314db2147dcd873": {
+  "idx": 10,
+  "emit": 65533,
+  "proposed": "▪",
+  "font": "Wingdings",
+  "wrong_chars": 787,
+  "decision": "accept"
+ },
+ "ffc1ad1de4075a78": {
+  "idx": 11,
+  "emit": 65533,
+  "proposed": ".",
+  "font": "Universal-NewswithCommPi",
+  "wrong_chars": 742,
+  "decision": "reject",
+  "note": "ambiguous small dot"
+ },
+ "b4f0ce7cb718d048": {
+  "idx": 12,
+  "emit": 65533,
+  "proposed": ".",
+  "font": "MTMIDDB",
+  "wrong_chars": 734,
+  "decision": "accept"
+ },
+ "5d4a4bca7962f85a": {
+  "idx": 13,
+  "emit": 65533,
+  "proposed": "¤",
+  "font": "Code2000",
+  "wrong_chars": 675,
+  "decision": "reject",
+  "note": "box glyph in download stamp"
+ },
+ "798f762de553fb23": {
+  "idx": 14,
+  "emit": 65533,
+  "proposed": "(",
+  "font": "mmatii",
+  "wrong_chars": 597,
+  "decision": "accept"
+ },
+ "68391f9d74e03a18": {
+  "idx": 15,
+  "emit": 65533,
+  "proposed": "°",
+  "font": "AdvPSSym",
+  "wrong_chars": 592,
+  "decision": "accept"
+ },
+ "18769997b50a70fe": {
+  "idx": 16,
+  "emit": 57600,
+  "proposed": "0",
+  "font": "DanteMTPro+e1",
+  "wrong_chars": 573,
+  "decision": "accept"
+ },
+ "bc568b7b3e61747c": {
+  "idx": 17,
+  "emit": 57602,
+  "proposed": "z",
+  "font": "DanteMTPro+e1",
+  "wrong_chars": 568,
+  "decision": "relabel",
+  "label": "2",
+  "note": "DanteMTPro oldstyle two"
+ },
+ "8632655e62b426e5": {
+  "idx": 18,
+  "emit": 65533,
+  "proposed": ",",
+  "font": "mmatii",
+  "wrong_chars": 556,
+  "decision": "accept"
+ },
+ "77dcded6549f3f1a": {
+  "idx": 19,
+  "emit": 65533,
+  "proposed": "fi",
+  "font": "Merriweather-Regular",
+  "wrong_chars": 448,
+  "decision": "accept"
+ },
+ "020e6a479f88f183": {
+  "idx": 20,
+  "emit": 65533,
+  "proposed": "|",
+  "font": "MathematicalPi-Three",
+  "wrong_chars": 410,
+  "decision": "accept"
+ },
+ "4c6d3f52ec6003ea": {
+  "idx": 21,
+  "emit": 57609,
+  "proposed": "9",
+  "font": "DanteMTPro+e1",
+  "wrong_chars": 404,
+  "decision": "accept"
+ },
+ "a9bf06a8f09598a1": {
+  "idx": 22,
+  "emit": 65533,
+  "proposed": "•",
+  "font": "SymbolMT",
+  "wrong_chars": 361,
+  "decision": "accept"
+ },
+ "770680faf5275877": {
+  "idx": 23,
+  "emit": 57344,
+  "proposed": "-",
+  "font": "font1",
+  "wrong_chars": 350,
+  "decision": "accept"
+ },
+ "96a4e02f7ef571c9": {
+  "idx": 24,
+  "emit": 58832,
+  "proposed": "⁻",
+  "font": "DY2+ZGVKv1-2",
+  "wrong_chars": 343,
+  "decision": "reject",
+  "note": "CNKI dotted leader"
+ },
+ "c1cdd53764ffc96e": {
+  "idx": 25,
+  "emit": 63035,
+  "proposed": "3",
+  "font": "SvxbbtMinionPro-Regular",
+  "wrong_chars": 343,
+  "decision": "accept"
+ },
+ "053e18b3200bf93b": {
+  "idx": 26,
+  "emit": 65533,
+  "proposed": "=",
+  "font": "MathematicalPi-Three",
+  "wrong_chars": 339,
+  "decision": "relabel",
+  "label": "/",
+  "note": "MathPi slash in URLs"
+ },
+ "56d82e071217be69": {
+  "idx": 27,
+  "emit": 65533,
+  "proposed": "◆",
+  "font": "KPSHBO+TT240DAo00",
+  "wrong_chars": 336,
+  "decision": "accept"
+ },
+ "30ca5ba195bfb6fe": {
+  "idx": 28,
+  "emit": 63040,
+  "proposed": "8",
+  "font": "SvxbbtMinionPro-Regular",
+  "wrong_chars": 333,
+  "decision": "accept"
+ },
+ "45fd5e5f042d474e": {
+  "idx": 29,
+  "emit": 63037,
+  "proposed": "5",
+  "font": "SvxbbtMinionPro-Regular",
+  "wrong_chars": 326,
+  "decision": "accept"
+ },
+ "e60cdd209c1f179e": {
+  "idx": 30,
+  "emit": 57603,
+  "proposed": "3",
+  "font": "DanteMTPro+e1",
+  "wrong_chars": 323,
+  "decision": "accept"
+ },
+ "ace404acc02c8061": {
+  "idx": 31,
+  "emit": 57608,
+  "proposed": "8",
+  "font": "DanteMTPro+e1",
+  "wrong_chars": 294,
+  "decision": "accept"
+ },
+ "04998423a735fba2": {
+  "idx": 32,
+  "emit": 65533,
+  "proposed": "fi",
+  "font": "Roboto-Regular",
+  "wrong_chars": 267,
+  "decision": "accept"
+ },
+ "34d4f5838b63a7cc": {
+  "idx": 33,
+  "emit": 63039,
+  "proposed": "7",
+  "font": "SvxbbtMinionPro-Regular",
+  "wrong_chars": 267,
+  "decision": "accept"
+ },
+ "50a14ce3e44940ae": {
+  "idx": 34,
+  "emit": 57604,
+  "proposed": "ñ",
+  "font": "AdvOT999035f4+e1",
+  "wrong_chars": 266,
+  "decision": "relabel",
+  "label": "fl",
+  "note": "Elsevier AdvOT fl ligature"
+ },
+ "40962b43867b9931": {
+  "idx": 35,
+  "emit": 63036,
+  "proposed": "4",
+  "font": "SvxbbtMinionPro-Regular",
+  "wrong_chars": 266,
+  "decision": "accept"
+ },
+ "007e8dd5f504b94f": {
+  "idx": 36,
+  "emit": 65533,
+  "proposed": "ti",
+  "font": "Calibri",
+  "wrong_chars": 262,
+  "decision": "accept"
+ },
+ "a67d0a2a3b7e9268": {
+  "idx": 37,
+  "emit": 57605,
+  "proposed": "5",
+  "font": "DanteMTPro+e1",
+  "wrong_chars": 252,
+  "decision": "accept"
+ },
+ "9a8585e9a883699d": {
+  "idx": 38,
+  "emit": 57607,
+  "proposed": "7",
+  "font": "DanteMTPro+e1",
+  "wrong_chars": 245,
+  "decision": "accept"
+ },
+ "79433c718a6c3803": {
+  "idx": 39,
+  "emit": 65533,
+  "proposed": "■",
+  "font": "Wingdings-Regular",
+  "wrong_chars": 244,
+  "decision": "accept"
+ },
+ "0f3b5fb99b38911d": {
+  "idx": 40,
+  "emit": 61550,
+  "proposed": "◆",
+  "font": "Webdings",
+  "wrong_chars": 238,
+  "decision": "relabel",
+  "label": "●",
+  "note": "Webdings black circle bullet"
+ },
+ "c64c6765744826e7": {
+  "idx": 41,
+  "emit": 65533,
+  "proposed": "■",
+  "font": "Wingdings2",
+  "wrong_chars": 234,
+  "decision": "accept"
+ },
+ "7a5d19cd42c8a75b": {
+  "idx": 42,
+  "emit": 57604,
+  "proposed": "4",
+  "font": "DanteMTPro+e1",
+  "wrong_chars": 234,
+  "decision": "accept"
+ },
+ "3a6a8fdec0ee9f55": {
+  "idx": 43,
+  "emit": 63038,
+  "proposed": "6",
+  "font": "SvxbbtMinionPro-Regular",
+  "wrong_chars": 222,
+  "decision": "accept"
+ },
+ "9043146881f14968": {
+  "idx": 44,
+  "emit": 57606,
+  "proposed": "6",
+  "font": "DanteMTPro+e1",
+  "wrong_chars": 222,
+  "decision": "accept"
+ },
+ "f5ebaf75ea6c8bdf": {
+  "idx": 45,
+  "emit": 65533,
+  "proposed": "(",
+  "font": "AdvP49C2A1",
+  "wrong_chars": 214,
+  "decision": "accept"
+ },
+ "b479f553d8a4c524": {
+  "idx": 46,
+  "emit": 65533,
+  "proposed": ")",
+  "font": "AdvP49C2A1",
+  "wrong_chars": 214,
+  "decision": "accept"
+ },
+ "d54ea1c2caa7d7d0": {
+  "idx": 47,
+  "emit": 61553,
+  "proposed": "Ω",
+  "font": "Wingdings-Regular",
+  "wrong_chars": 192,
+  "decision": "relabel",
+  "label": "❑",
+  "note": "Wingdings shadowed square bullet"
+ },
+ "e137ff091582b875": {
+  "idx": 48,
+  "emit": 61520,
+  "proposed": "✓",
+  "font": "Wingdings2",
+  "wrong_chars": 189,
+  "decision": "accept"
+ },
+ "8c9fe12babdd1506": {
+  "idx": 49,
+  "emit": 65533,
+  "proposed": "™",
+  "font": "AdvPSSym",
+  "wrong_chars": 185,
+  "decision": "accept"
+ },
+ "91da578c798d3d28": {
+  "idx": 50,
+  "emit": 65533,
+  "proposed": "(",
+  "font": "CMEX8",
+  "wrong_chars": 181,
+  "decision": "accept"
+ },
+ "cff898d72ef46baf": {
+  "idx": 51,
+  "emit": 65533,
+  "proposed": ")",
+  "font": "CMEX8",
+  "wrong_chars": 181,
+  "decision": "accept"
+ },
+ "7f4278e9a0886ea1": {
+  "idx": 52,
+  "emit": 65533,
+  "proposed": "=",
+  "font": "Cambria",
+  "wrong_chars": 166,
+  "decision": "accept"
+ },
+ "0bda18b9d6904adb": {
+  "idx": 53,
+  "emit": 65533,
+  "proposed": "_",
+  "font": "AdvP415979",
+  "wrong_chars": 153,
+  "decision": "reject",
+  "note": "ambiguous low bar"
+ },
+ "7e6a67235ae20bfe": {
+  "idx": 54,
+  "emit": 65533,
+  "proposed": "(",
+  "font": "MathematicalPi-Three",
+  "wrong_chars": 149,
+  "decision": "accept"
+ },
+ "0025b695e3c407b2": {
+  "idx": 55,
+  "emit": 65533,
+  "proposed": ")",
+  "font": "MathematicalPi-Three",
+  "wrong_chars": 149,
+  "decision": "accept"
+ },
+ "eb62e25e441bb580": {
+  "idx": 56,
+  "emit": 65533,
+  "proposed": "fi",
+  "font": "CormorantGaramond-Regular",
+  "wrong_chars": 148,
+  "decision": "accept"
+ },
+ "dcc3ac2d544e1a46": {
+  "idx": 57,
+  "emit": 63333,
+  "proposed": "e",
+  "font": "AdvOT1ef757c0+f7",
+  "wrong_chars": 148,
+  "decision": "accept"
+ },
+ "f4e99b8b8e5a7bcb": {
+  "idx": 58,
+  "emit": 65533,
+  "proposed": "✔",
+  "font": "AdvP3D5CA1",
+  "wrong_chars": 148,
+  "decision": "accept"
+ },
+ "e437801732d11fd5": {
+  "idx": 59,
+  "emit": 65533,
+  "proposed": "fi",
+  "font": "EBGaramond-Regular",
+  "wrong_chars": 147,
+  "decision": "accept"
+ },
+ "c5671527e22d2400": {
+  "idx": 60,
+  "emit": 63329,
+  "proposed": "a",
+  "font": "AdvOT1ef757c0+f7",
+  "wrong_chars": 145,
+  "decision": "accept"
+ },
+ "6dfa634950b05a78": {
+  "idx": 61,
+  "emit": 65533,
+  "proposed": "(",
+  "font": "Cambria",
+  "wrong_chars": 142,
+  "decision": "accept"
+ },
+ "62bf90f0fa90f4fd": {
+  "idx": 62,
+  "emit": 65533,
+  "proposed": ")",
+  "font": "Cambria",
+  "wrong_chars": 141,
+  "decision": "accept"
+ },
+ "d61c7373235b1c68": {
+  "idx": 63,
+  "emit": 63196,
+  "proposed": "1",
+  "font": "RbbnxgMyriadPro-Regular",
+  "wrong_chars": 140,
+  "decision": "accept"
+ },
+ "a61a5c2ed4c6677e": {
+  "idx": 64,
+  "emit": 63343,
+  "proposed": "o",
+  "font": "AdvOT1ef757c0+f7",
+  "wrong_chars": 137,
+  "decision": "accept"
+ },
+ "fa501c80846d82ef": {
+  "idx": 65,
+  "emit": 57501,
+  "proposed": "R",
+  "font": "AdvOT999035f4+e0",
+  "wrong_chars": 134,
+  "decision": "relabel",
+  "label": "ft",
+  "note": "AdvOT ft ligature"
+ },
+ "630016dc62221974": {
+  "idx": 66,
+  "emit": 63337,
+  "proposed": "i",
+  "font": "AdvOT1ef757c0+f7",
+  "wrong_chars": 133,
+  "decision": "accept"
+ },
+ "57232aacaa227653": {
+  "idx": 67,
+  "emit": 62960,
+  "proposed": "—",
+  "font": "AdvOT58b04b30.B+f5",
+  "wrong_chars": 130,
+  "decision": "accept"
+ },
+ "979a7c9311b227d5": {
+  "idx": 68,
+  "emit": 65533,
+  "proposed": "'",
+  "font": "TTEF38o00",
+  "wrong_chars": 126,
+  "decision": "relabel",
+  "label": "‘",
+  "note": "left single quote"
+ },
+ "64d068b4e76585e3": {
+  "idx": 69,
+  "emit": 65533,
+  "proposed": "'",
+  "font": "TTEF38o00",
+  "wrong_chars": 126,
+  "decision": "relabel",
+  "label": "’",
+  "note": "right single quote"
+ },
+ "19e2efc1f1c96a53": {
+  "idx": 70,
+  "emit": 65533,
+  "proposed": "⊗",
+  "font": "stmary10",
+  "wrong_chars": 126,
+  "decision": "accept"
+ },
+ "3603c03c5df27197": {
+  "idx": 71,
+  "emit": 65533,
+  "proposed": "∏",
+  "font": "Symbol",
+  "wrong_chars": 125,
+  "decision": "reject",
+  "note": "notdef box"
+ },
+ "166860eb38536477": {
+  "idx": 72,
+  "emit": 65533,
+  "proposed": "¯",
+  "font": "MT-Extra",
+  "wrong_chars": 122,
+  "decision": "relabel",
+  "label": "˜",
+  "note": "MT Extra spacing tilde accent"
+ },
+ "a08bc2eeeb4d08af": {
+  "idx": 73,
+  "emit": 63342,
+  "proposed": "Ν",
+  "font": "AdvOT1ef757c0+f7",
+  "wrong_chars": 121,
+  "decision": "relabel",
+  "label": "n",
+  "note": "small capital N"
+ },
+ "f7e730b05a93ab27": {
+  "idx": 74,
+  "emit": 65533,
+  "proposed": "+",
+  "font": "Cambria",
+  "wrong_chars": 117,
+  "decision": "accept"
+ },
+ "737cc14cdba03887": {
+  "idx": 75,
+  "emit": 65533,
+  "proposed": "⃗",
+  "font": "CambriaMath",
+  "wrong_chars": 116,
+  "decision": "reject",
+  "note": "math accent piece"
+ },
+ "8ef5655f905ed327": {
+  "idx": 76,
+  "emit": 61492,
+  "proposed": "_",
+  "font": "EuclidExtra",
+  "wrong_chars": 115,
+  "decision": "reject",
+  "note": "leader rule"
+ },
+ "3465c686fa40b447": {
+  "idx": 77,
+  "emit": 65533,
+  "proposed": "fi",
+  "font": "PTSerif-Regular",
+  "wrong_chars": 114,
+  "decision": "accept"
+ },
+ "5ddb458d514b0787": {
+  "idx": 78,
+  "emit": 65533,
+  "proposed": "—",
+  "font": "MathematicalPi-One",
+  "wrong_chars": 109,
+  "decision": "accept"
+ },
+ "f74ec9295ce334ed": {
+  "idx": 79,
+  "emit": 65533,
+  "proposed": "∼",
+  "font": "MathPiFiveItalic",
+  "wrong_chars": 109,
+  "decision": "accept"
+ },
+ "4ec814d0f172c449": {
+  "idx": 80,
+  "emit": 63348,
+  "proposed": "t",
+  "font": "AdvOT1ef757c0+f7",
+  "wrong_chars": 108,
+  "decision": "accept"
+ },
+ "5746bf7fb4b69649": {
+  "idx": 81,
+  "emit": 59456,
+  "proposed": "Ø",
+  "font": "AdvTTc4b97297+e8",
+  "wrong_chars": 104,
+  "decision": "reject",
+  "note": "ORCID icon, no character"
+ },
+ "1580d49043f913eb": {
+  "idx": 82,
+  "emit": 65533,
+  "proposed": "[",
+  "font": "mmahvli",
+  "wrong_chars": 103,
+  "decision": "accept"
+ },
+ "b4610c9f0c73d427": {
+  "idx": 83,
+  "emit": 65533,
+  "proposed": "]",
+  "font": "mmahvli",
+  "wrong_chars": 103,
+  "decision": "accept"
+ },
+ "3469231e1b32b6b7": {
+  "idx": 84,
+  "emit": 65533,
+  "proposed": "{",
+  "font": "AdvBMa1",
+  "wrong_chars": 102,
+  "decision": "reject",
+  "note": "hyphen, minus or en dash"
+ },
+ "a6e6ddc1bf5d6205": {
+  "idx": 85,
+  "emit": 65533,
+  "proposed": "~",
+  "font": "Universal-GreekwithMathPi",
+  "wrong_chars": 101,
+  "decision": "relabel",
+  "label": "(",
+  "note": "left parenthesis"
+ },
+ "a9572fcf1f15a51a": {
+  "idx": 86,
+  "emit": 65533,
+  "proposed": "!",
+  "font": "Universal-GreekwithMathPi",
+  "wrong_chars": 101,
+  "decision": "relabel",
+  "label": ")",
+  "note": "right parenthesis"
+ },
+ "cb39ee3d46f1f672": {
+  "idx": 87,
+  "emit": 65533,
+  "proposed": "‰",
+  "font": "Wingdings-Regular",
+  "wrong_chars": 96,
+  "decision": "reject",
+  "note": "book icon"
+ },
+ "99bdbaa2d2fc5ecd": {
+  "idx": 88,
+  "emit": 63044,
+  "proposed": "ι",
+  "font": "AGaramondPro-Regular",
+  "wrong_chars": 95,
+  "decision": "relabel",
+  "label": "1",
+  "note": "AGaramond oldstyle one"
+ },
+ "dbbcadb3193be3e9": {
+  "idx": 89,
+  "emit": 65533,
+  "proposed": "q",
+  "font": "CormorantGaramond-Regular",
+  "wrong_chars": 94,
+  "decision": "reject",
+  "note": "plain letter for a U+FFFD glyph (unmapped-layer territory)"
+ },
+ "9c88bc583d54e12c": {
+  "idx": 90,
+  "emit": 61530,
+  "proposed": "Z",
+  "font": "EuclidMathTwo",
+  "wrong_chars": 94,
+  "decision": "relabel",
+  "label": "ℤ",
+  "note": "double-struck Z"
+ },
+ "c5403adf54bc070f": {
+  "idx": 91,
+  "emit": 65533,
+  "proposed": "=",
+  "font": "SymbolMT.00",
+  "wrong_chars": 89,
+  "decision": "accept"
+ },
+ "c6381fbe78e9c51f": {
+  "idx": 92,
+  "emit": 65533,
+  "proposed": "fl",
+  "font": "Merriweather-Regular",
+  "wrong_chars": 87,
+  "decision": "accept"
+ },
+ "67ad5b665267ee6d": {
+  "idx": 93,
+  "emit": 63347,
+  "proposed": "s",
+  "font": "AdvOT1ef757c0+f7",
+  "wrong_chars": 87,
+  "decision": "accept"
+ },
+ "880c25a9d5684521": {
+  "idx": 94,
+  "emit": 65533,
+  "proposed": "(",
+  "font": "CMEX9",
+  "wrong_chars": 86,
+  "decision": "accept"
+ },
+ "06b1ea3031958931": {
+  "idx": 95,
+  "emit": 61744,
+  "proposed": "0",
+  "font": "AdvOT4f49f862+f1",
+  "wrong_chars": 86,
+  "decision": "accept"
+ },
+ "852769e79a4e6694": {
+  "idx": 96,
+  "emit": 19,
+  "proposed": "✓",
+  "font": "Dingbats",
+  "wrong_chars": 85,
+  "decision": "accept"
+ },
+ "b224fc334a262c5d": {
+  "idx": 97,
+  "emit": 63346,
+  "proposed": "r",
+  "font": "AdvOT1ef757c0+f7",
+  "wrong_chars": 85,
+  "decision": "accept"
+ },
+ "2ced09e143ba91f4": {
+  "idx": 98,
+  "emit": 65533,
+  "proposed": "(",
+  "font": "SymbolMT.00",
+  "wrong_chars": 84,
+  "decision": "accept"
+ },
+ "e434bb222e39dd18": {
+  "idx": 99,
+  "emit": 65533,
+  "proposed": "(",
+  "font": "CMEX9",
+  "wrong_chars": 84,
+  "decision": "accept"
+ },
+ "843d4ff8fae8181d": {
+  "idx": 100,
+  "emit": 65533,
+  "proposed": ")",
+  "font": "CMEX9",
+  "wrong_chars": 84,
+  "decision": "accept"
+ },
+ "fb57a165c48e4d95": {
+  "idx": 101,
+  "emit": 65533,
+  "proposed": "´",
+  "font": "Times-PhoneticAlternate",
+  "wrong_chars": 84,
+  "decision": "reject",
+  "note": "Vietnamese hook-above mark drawn as a separate glyph"
+ },
+ "c87390869106f139": {
+  "idx": 102,
+  "emit": 65533,
+  "proposed": ")",
+  "font": "SymbolMT.00",
+  "wrong_chars": 82,
+  "decision": "accept"
+ },
+ "9f18defcf340c893": {
+  "idx": 103,
+  "emit": 65533,
+  "proposed": "−",
+  "font": "Cambria",
+  "wrong_chars": 81,
+  "decision": "accept"
+ },
+ "30a60287f81e72a9": {
+  "idx": 104,
+  "emit": 63340,
+  "proposed": "l",
+  "font": "AdvOT1ef757c0+f7",
+  "wrong_chars": 81,
+  "decision": "accept"
+ },
+ "164021f4032d6210": {
+  "idx": 105,
+  "emit": 65533,
+  "proposed": "●",
+  "font": "Mathematica3",
+  "wrong_chars": 81,
+  "decision": "accept"
+ },
+ "eaf0dddbbc027e6f": {
+  "idx": 106,
+  "emit": 65533,
+  "proposed": "■",
+  "font": "Mathematica3",
+  "wrong_chars": 81,
+  "decision": "accept"
+ },
+ "31669354d947403b": {
+  "idx": 107,
+  "emit": 63045,
+  "proposed": "z",
+  "font": "AGaramondPro-Regular",
+  "wrong_chars": 79,
+  "decision": "relabel",
+  "label": "2",
+  "note": "AGaramond oldstyle two"
+ },
+ "64d44563a4a3ed4e": {
+  "idx": 108,
+  "emit": 57601,
+  "proposed": "ι",
+  "font": "DanteMTPro-Italic+e1",
+  "wrong_chars": 78,
+  "decision": "relabel",
+  "label": "1",
+  "note": "DanteMTPro italic oldstyle one"
+ },
+ "4cc6c98ec974e8ac": {
+  "idx": 109,
+  "emit": 65533,
+  "proposed": "➔",
+  "font": "AdvPS_ZD",
+  "wrong_chars": 77,
+  "decision": "accept"
+ },
+ "d1c01d585e5ddeb7": {
+  "idx": 110,
+  "emit": 65533,
+  "proposed": "■",
+  "font": "Webdings",
+  "wrong_chars": 74,
+  "decision": "accept"
+ },
+ "12effac53c2ab347": {
+  "idx": 111,
+  "emit": 65533,
+  "proposed": "↔",
+  "font": "XYDASH10",
+  "wrong_chars": 72,
+  "decision": "reject",
+  "note": "xy-pic line piece"
+ },
+ "0dc1baf4e1605f32": {
+  "idx": 112,
+  "emit": 65533,
+  "proposed": "¸",
+  "font": "XYDASH10",
+  "wrong_chars": 72,
+  "decision": "reject",
+  "note": "xy-pic line piece"
+ },
+ "a8204e2f4eac0160": {
+  "idx": 113,
+  "emit": 61621,
+  "proposed": "¯",
+  "font": "MT-Extra",
+  "wrong_chars": 71,
+  "decision": "reject",
+  "note": "wide circumflex accent"
+ },
+ "68c4636519700640": {
+  "idx": 114,
+  "emit": 63336,
+  "proposed": "n",
+  "font": "AdvOT1ef757c0+f7",
+  "wrong_chars": 71,
+  "decision": "relabel",
+  "label": "h",
+  "note": "small capital H"
+ },
+ "59a4d67371f5a782": {
+  "idx": 115,
+  "emit": 65533,
+  "proposed": "a",
+  "font": "MT-Extra",
+  "wrong_chars": 71,
+  "decision": "reject",
+  "note": "dot accent (V-dot), not a letter"
+ },
+ "27ea3b60c4b6cbca": {
+  "idx": 116,
+  "emit": 65533,
+  "proposed": "©",
+  "font": "AdvT001",
+  "wrong_chars": 70,
+  "decision": "accept"
+ },
+ "016504b928c821df": {
+  "idx": 117,
+  "emit": 65533,
+  "proposed": "[",
+  "font": "BLEX",
+  "wrong_chars": 69,
+  "decision": "accept"
+ },
+ "d12b89088d62a206": {
+  "idx": 118,
+  "emit": 65533,
+  "proposed": "]",
+  "font": "BLEX",
+  "wrong_chars": 69,
+  "decision": "accept"
+ },
+ "1f4e56c7db3f3c33": {
+  "idx": 119,
+  "emit": 65533,
+  "proposed": "®",
+  "font": "AdvPSSym",
+  "wrong_chars": 69,
+  "decision": "accept"
+ },
+ "e49596146d529090": {
+  "idx": 120,
+  "emit": 65533,
+  "proposed": "fi",
+  "font": "CharisSIL",
+  "wrong_chars": 69,
+  "decision": "accept"
+ },
+ "b278e30ed88534bb": {
+  "idx": 121,
+  "emit": 63719,
+  "proposed": "⎯",
+  "font": "SymbolMT",
+  "wrong_chars": 68,
+  "decision": "relabel",
+  "label": "⎯",
+  "note": "Symbol arrow extender"
+ },
+ "3a1bae9bad0a359a": {
+  "idx": 122,
+  "emit": 65533,
+  "proposed": "a",
+  "font": "Times-PhoneticIPA",
+  "wrong_chars": 68,
+  "decision": "relabel",
+  "label": "ʼ",
+  "note": "IPA modifier apostrophe"
+ },
+ "2be6a6eadc79b1b7": {
+  "idx": 123,
+  "emit": 65533,
+  "proposed": "−",
+  "font": "Cambria",
+  "wrong_chars": 67,
+  "decision": "accept"
+ },
+ "3d491166e299b503": {
+  "idx": 124,
+  "emit": 65533,
+  "proposed": "h",
+  "font": "AdvP49C2A1",
+  "wrong_chars": 67,
+  "decision": "relabel",
+  "label": "[",
+  "note": "left bracket"
+ },
+ "59f04eb43eb1c193": {
+  "idx": 125,
+  "emit": 65533,
+  "proposed": "]",
+  "font": "AdvP49C2A1",
+  "wrong_chars": 67,
+  "decision": "accept"
+ },
+ "6f8376e83489ffa4": {
+  "idx": 126,
+  "emit": 65533,
+  "proposed": "∥",
+  "font": "CIDFont+F4",
+  "wrong_chars": 67,
+  "decision": "reject",
+  "note": "Arabic positional form"
+ },
+ "3db134e11635cecd": {
+  "idx": 127,
+  "emit": 65533,
+  "proposed": "®",
+  "font": "AdvPSSym",
+  "wrong_chars": 66,
+  "decision": "accept"
+ },
+ "fe62941396448ce0": {
+  "idx": 128,
+  "emit": 65533,
+  "proposed": "¸",
+  "font": "XYDASH10",
+  "wrong_chars": 66,
+  "decision": "reject",
+  "note": "xy-pic line piece"
+ },
+ "835c338365f91151": {
+  "idx": 129,
+  "emit": 65533,
+  "proposed": "∞",
+  "font": "XYDASH10",
+  "wrong_chars": 66,
+  "decision": "reject",
+  "note": "xy-pic line piece"
+ },
+ "3d67db1fa158d598": {
+  "idx": 130,
+  "emit": 65533,
+  "proposed": "ffi",
+  "font": "Merriweather-Regular",
+  "wrong_chars": 65,
+  "decision": "accept"
+ },
+ "7cb1e9fcb06c4f26": {
+  "idx": 131,
+  "emit": 65533,
+  "proposed": "×",
+  "font": "XYDASH10",
+  "wrong_chars": 64,
+  "decision": "reject",
+  "note": "xy-pic line piece"
+ },
+ "8ac693c763bad1e0": {
+  "idx": 132,
+  "emit": 63046,
+  "proposed": "β",
+  "font": "AGaramondPro-Regular",
+  "wrong_chars": 64,
+  "decision": "relabel",
+  "label": "3",
+  "note": "AGaramond oldstyle three"
+ },
+ "140fc63d214b9925": {
+  "idx": 133,
+  "emit": 65533,
+  "proposed": "‘",
+  "font": "AdvPSMP1",
+  "wrong_chars": 63,
+  "decision": "accept"
+ },
+ "b3f9f4052a07dfbc": {
+  "idx": 134,
+  "emit": 65533,
+  "proposed": "(",
+  "font": "CMEX7",
+  "wrong_chars": 63,
+  "decision": "accept"
+ },
+ "3aa88e6f7e2a132d": {
+  "idx": 135,
+  "emit": 65533,
+  "proposed": ")",
+  "font": "CMEX7",
+  "wrong_chars": 63,
+  "decision": "accept"
+ },
+ "172ee3d234f2fe27": {
+  "idx": 136,
+  "emit": 63045,
+  "proposed": "2",
+  "font": "MinionPro-It",
+  "wrong_chars": 61,
+  "decision": "accept"
+ },
+ "d8255b2d9c706768": {
+  "idx": 137,
+  "emit": 65533,
+  "proposed": "[",
+  "font": "stmary10",
+  "wrong_chars": 61,
+  "decision": "relabel",
+  "label": "⟦",
+  "note": "white left square bracket"
+ },
+ "3c88cc00142243d6": {
+  "idx": 138,
+  "emit": 65533,
+  "proposed": "]",
+  "font": "stmary10",
+  "wrong_chars": 61,
+  "decision": "relabel",
+  "label": "⟧",
+  "note": "white right square bracket"
+ },
+ "809a3ed228a92ffb": {
+  "idx": 139,
+  "emit": 65533,
+  "proposed": "fl",
+  "font": "CormorantGaramond-Regular",
+  "wrong_chars": 61,
+  "decision": "accept"
+ },
+ "62cab20a1c5d2f78": {
+  "idx": 140,
+  "emit": 65533,
+  "proposed": "⊆",
+  "font": "MT2SYT",
+  "wrong_chars": 60,
+  "decision": "accept"
+ },
+ "c64f622e3d20183e": {
+  "idx": 141,
+  "emit": 65533,
+  "proposed": "°",
+  "font": "AdvTTab7e17fd",
+  "wrong_chars": 60,
+  "decision": "accept"
+ },
+ "4ec6d5d4b810ee47": {
+  "idx": 142,
+  "emit": 65533,
+  "proposed": "¯",
+  "font": "cmr10",
+  "wrong_chars": 59,
+  "decision": "reject",
+  "note": "macron accent"
+ },
+ "074d6e2304051321": {
+  "idx": 143,
+  "emit": 63193,
+  "proposed": "©",
+  "font": "SymbolMT",
+  "wrong_chars": 57,
+  "decision": "accept"
+ },
+ "47862310193a6b94": {
+  "idx": 144,
+  "emit": 57901,
+  "proposed": "Α",
+  "font": "STIXMathCalligraphy-Regular",
+  "wrong_chars": 57,
+  "decision": "relabel",
+  "label": "𝒜",
+  "note": "STIX script capital A"
+ },
+ "3a9f4e5ff438d92f": {
+  "idx": 145,
+  "emit": 65533,
+  "proposed": "̅",
+  "font": "Cambria",
+  "wrong_chars": 57,
+  "decision": "reject",
+  "note": "overline bar"
+ },
+ "16237654c298e4eb": {
+  "idx": 146,
+  "emit": 65533,
+  "proposed": "(",
+  "font": "CMEX8",
+  "wrong_chars": 56,
+  "decision": "accept"
+ },
+ "6b88dfcd9ecbb80b": {
+  "idx": 147,
+  "emit": 65533,
+  "proposed": ")",
+  "font": "CMEX8",
+  "wrong_chars": 56,
+  "decision": "accept"
+ },
+ "4162c3c536bbbe6c": {
+  "idx": 148,
+  "emit": 65533,
+  "proposed": "-",
+  "font": "PalatinoLinotype-Roman",
+  "wrong_chars": 53,
+  "decision": "accept"
+ },
+ "5b8cc36bd32f2dcd": {
+  "idx": 149,
+  "emit": 23,
+  "proposed": "✗",
+  "font": "Dingbats",
+  "wrong_chars": 53,
+  "decision": "accept"
+ },
+ "300248f8826645d3": {
+  "idx": 150,
+  "emit": 57365,
+  "proposed": "i",
+  "font": "DanteMTPro+e0",
+  "wrong_chars": 53,
+  "decision": "accept"
+ },
+ "3eaaa7a0a7b31c3a": {
+  "idx": 151,
+  "emit": 65533,
+  "proposed": "●",
+  "font": "Wingdings-Regular",
+  "wrong_chars": 52,
+  "decision": "accept"
+ },
+ "c9a7ce46fb9e0339": {
+  "idx": 152,
+  "emit": 65533,
+  "proposed": "(",
+  "font": "CMEX9",
+  "wrong_chars": 52,
+  "decision": "accept"
+ },
+ "8d48fb566b12cd4b": {
+  "idx": 153,
+  "emit": 65533,
+  "proposed": "◆",
+  "font": "Mathematica3",
+  "wrong_chars": 51,
+  "decision": "accept"
+ },
+ "b3f485b13d727a7b": {
+  "idx": 154,
+  "emit": 65533,
+  "proposed": "▲",
+  "font": "Mathematica3",
+  "wrong_chars": 51,
+  "decision": "accept"
+ },
+ "90a28573bab60147": {
+  "idx": 155,
+  "emit": 65533,
+  "proposed": "|",
+  "font": "MTEX",
+  "wrong_chars": 50,
+  "decision": "relabel",
+  "label": "}",
+  "note": "big right brace"
+ },
+ "503365bc264fdb6c": {
+  "idx": 156,
+  "emit": 65533,
+  "proposed": "≤",
+  "font": "Cambria",
+  "wrong_chars": 50,
+  "decision": "accept"
+ },
+ "779c5e14495658c7": {
+  "idx": 157,
+  "emit": 57375,
+  "proposed": "n",
+  "font": "DanteMTPro+e0",
+  "wrong_chars": 49,
+  "decision": "accept"
+ },
+ "9586b1f134535c88": {
+  "idx": 158,
+  "emit": 57344,
+  "proposed": "a",
+  "font": "DanteMTPro+e0",
+  "wrong_chars": 49,
+  "decision": "accept"
+ },
+ "1a400756cef79c40": {
+  "idx": 159,
+  "emit": 57391,
+  "proposed": "t",
+  "font": "DanteMTPro+e0",
+  "wrong_chars": 49,
+  "decision": "accept"
+ },
+ "f2428c65f4f324b6": {
+  "idx": 160,
+  "emit": 65533,
+  "proposed": "¡",
+  "font": "CMEX8",
+  "wrong_chars": 48,
+  "decision": "reject",
+  "note": "vertical extender piece"
+ },
+ "4e047ab88cc1dbde": {
+  "idx": 161,
+  "emit": 65533,
+  "proposed": "(",
+  "font": "PalatinoLinotype-Roman",
+  "wrong_chars": 48,
+  "decision": "accept"
+ },
+ "23c4b22a41b26aa7": {
+  "idx": 162,
+  "emit": 65533,
+  "proposed": ")",
+  "font": "PalatinoLinotype-Roman",
+  "wrong_chars": 48,
+  "decision": "accept"
+ },
+ "ad10895b3d5f138c": {
+  "idx": 163,
+  "emit": 65533,
+  "proposed": "¸",
+  "font": "XYDASH10",
+  "wrong_chars": 48,
+  "decision": "reject",
+  "note": "xy-pic line piece"
+ },
+ "3fe8ec5cf68fc87b": {
+  "idx": 164,
+  "emit": 65533,
+  "proposed": ".",
+  "font": "Arial",
+  "wrong_chars": 48,
+  "decision": "accept"
+ },
+ "589f03d8bbd4b994": {
+  "idx": 165,
+  "emit": 61548,
+  "proposed": "●",
+  "font": "Wingdings-Regular",
+  "wrong_chars": 48,
+  "decision": "accept"
+ },
+ "e4f858d369961ff5": {
+  "idx": 166,
+  "emit": 65533,
+  "proposed": "¡",
+  "font": "CMEX7",
+  "wrong_chars": 48,
+  "decision": "reject",
+  "note": "vertical extender piece"
+ },
+ "79b3b513ce2473b7": {
+  "idx": 167,
+  "emit": 65533,
+  "proposed": "=",
+  "font": "SymbolMT",
+  "wrong_chars": 47,
+  "decision": "accept"
+ },
+ "7eaa39d8e4a271fb": {
+  "idx": 168,
+  "emit": 65533,
+  "proposed": "|",
+  "font": "MTEX",
+  "wrong_chars": 47,
+  "decision": "relabel",
+  "label": "{",
+  "note": "big left brace"
+ },
+ "55e63204c800e1b7": {
+  "idx": 169,
+  "emit": 65533,
+  "proposed": "■",
+  "font": "MSAM10",
+  "wrong_chars": 47,
+  "decision": "accept"
+ },
+ "f4b8db718e19a7b0": {
+  "idx": 170,
+  "emit": 57902,
+  "proposed": "E",
+  "font": "STIXMathCalligraphy-Regular",
+  "wrong_chars": 47,
+  "decision": "relabel",
+  "label": "ℬ",
+  "note": "script capital B"
+ },
+ "6d2513d499ca72b7": {
+  "idx": 171,
+  "emit": 63043,
+  "proposed": "o",
+  "font": "AGaramondPro-Regular",
+  "wrong_chars": 47,
+  "decision": "relabel",
+  "label": "0",
+  "note": "AGaramond oldstyle zero"
+ },
+ "3335e456852d1253": {
+  "idx": 172,
+  "emit": 65533,
+  "proposed": "+",
+  "font": "CambriaMath",
+  "wrong_chars": 46,
+  "decision": "reject",
+  "note": "ambiguous cross shape"
+ },
+ "efc84c9bd3f45d59": {
+  "idx": 173,
+  "emit": 65533,
+  "proposed": "¸",
+  "font": "CMEX8",
+  "wrong_chars": 46,
+  "decision": "reject",
+  "note": "vertical extender piece"
+ },
+ "5bb5e91f06d6d317": {
+  "idx": 174,
+  "emit": 65533,
+  "proposed": "_",
+  "font": "AdvPS4DC51B",
+  "wrong_chars": 46,
+  "decision": "reject",
+  "note": "hyphen, minus or en dash"
+ },
+ "b9aa94ff6cff49e3": {
+  "idx": 175,
+  "emit": 65533,
+  "proposed": ".",
+  "font": "Gen_Helvetica",
+  "wrong_chars": 46,
+  "decision": "accept"
+ },
+ "eada9105abd9f24f": {
+  "idx": 176,
+  "emit": 65533,
+  "proposed": "|",
+  "font": "MathematicalPi-One",
+  "wrong_chars": 45,
+  "decision": "accept"
+ },
+ "dcfb8850974245c9": {
+  "idx": 177,
+  "emit": 63341,
+  "proposed": "m",
+  "font": "AdvOT1ef757c0+f7",
+  "wrong_chars": 45,
+  "decision": "accept"
+ },
+ "4fbcf2c2e1572293": {
+  "idx": 178,
+  "emit": 63052,
+  "proposed": "η",
+  "font": "AGaramondPro-Regular",
+  "wrong_chars": 45,
+  "decision": "relabel",
+  "label": "9",
+  "note": "AGaramond oldstyle nine"
+ },
+ "647c2f95faadc9e7": {
+  "idx": 179,
+  "emit": 58828,
+  "proposed": "≠",
+  "font": "DY1+ZDECD4-3",
+  "wrong_chars": 45,
+  "decision": "reject",
+  "note": "CNKI double rule decoration"
+ },
+ "6a75ba56ea7a9df7": {
+  "idx": 180,
+  "emit": 65533,
+  "proposed": "¡",
+  "font": "MTEX",
+  "wrong_chars": 44,
+  "decision": "reject",
+  "note": "radical extender piece"
+ },
+ "ff8d344ea1ea3a22": {
+  "idx": 181,
+  "emit": 65533,
+  "proposed": "¯",
+  "font": "NqbqnrCqkvtkCMEX10",
+  "wrong_chars": 44,
+  "decision": "reject",
+  "note": "wide tilde accent"
+ },
+ "029f5cddf03264ab": {
+  "idx": 182,
+  "emit": 61600,
+  "proposed": "∙",
+  "font": "Wingdings",
+  "wrong_chars": 44,
+  "decision": "relabel",
+  "label": "▪",
+  "note": "Wingdings small square bullet"
+ },
+ "f1f37c4ec4cf7300": {
+  "idx": 183,
+  "emit": 65533,
+  "proposed": "⊕",
+  "font": "stmary10",
+  "wrong_chars": 44,
+  "decision": "accept"
+ },
+ "14f15a620487b082": {
+  "idx": 184,
+  "emit": 61513,
+  "proposed": "Ι",
+  "font": "EuclidMathTwo",
+  "wrong_chars": 44,
+  "decision": "relabel",
+  "label": "𝕀",
+  "note": "double-struck I"
+ },
+ "0a694976de323c35": {
+  "idx": 185,
+  "emit": 65533,
+  "proposed": "¯",
+  "font": "MSBM10",
+  "wrong_chars": 42,
+  "decision": "reject",
+  "note": "wide hat accent"
+ },
+ "5c07df4fdd168360": {
+  "idx": 186,
+  "emit": 63047,
+  "proposed": "4",
+  "font": "MinionPro-It",
+  "wrong_chars": 41,
+  "decision": "accept"
+ },
+ "a4e01268c0a7e9ef": {
+  "idx": 187,
+  "emit": 65533,
+  "proposed": "\\",
+  "font": "Helvetica",
+  "wrong_chars": 41,
+  "decision": "reject",
+  "note": "ambiguous hook"
+ },
+ "32b9a89d497a0398": {
+  "idx": 188,
+  "emit": 63332,
+  "proposed": "d",
+  "font": "AdvOT1ef757c0+f7",
+  "wrong_chars": 41,
+  "decision": "accept"
+ },
+ "1f47745bfdb69a62": {
+  "idx": 189,
+  "emit": 65533,
+  "proposed": "_",
+  "font": "XYBTIP10",
+  "wrong_chars": 40,
+  "decision": "reject",
+  "note": "xy-pic line piece"
+ },
+ "f80075cda3a1af5e": {
+  "idx": 190,
+  "emit": 65533,
+  "proposed": "¸",
+  "font": "XYDASH10",
+  "wrong_chars": 40,
+  "decision": "reject",
+  "note": "xy-pic line piece"
+ },
+ "1b68370b96d87ac3": {
+  "idx": 191,
+  "emit": 65533,
+  "proposed": "×",
+  "font": "XYDASH10",
+  "wrong_chars": 40,
+  "decision": "reject",
+  "note": "xy-pic line piece"
+ },
+ "2d9c2bccd8bcbc80": {
+  "idx": 192,
+  "emit": 65533,
+  "proposed": "⊗",
+  "font": "stmary8",
+  "wrong_chars": 40,
+  "decision": "accept"
+ },
+ "94c98cae95831507": {
+  "idx": 193,
+  "emit": 65533,
+  "proposed": "|",
+  "font": "FranklinGothic-Book",
+  "wrong_chars": 40,
+  "decision": "reject",
+  "note": "plain letter in an unmapped text layer"
+ },
+ "5adb944c34d8ca5a": {
+  "idx": 194,
+  "emit": 61614,
+  "proposed": "Ε",
+  "font": "BKMcm",
+  "wrong_chars": 39,
+  "decision": "relabel",
+  "label": "ff",
+  "note": "ff ligature"
+ },
+ "0f444387818de147": {
+  "idx": 195,
+  "emit": 65533,
+  "proposed": "=",
+  "font": "CambriaMath",
+  "wrong_chars": 39,
+  "decision": "accept"
+ },
+ "3d09229c4e520a44": {
+  "idx": 196,
+  "emit": 65533,
+  "proposed": "{",
+  "font": "mmatii",
+  "wrong_chars": 39,
+  "decision": "accept"
+ },
+ "33e1264c2b3d0830": {
+  "idx": 197,
+  "emit": 65533,
+  "proposed": "e",
+  "font": "mmatii",
+  "wrong_chars": 39,
+  "decision": "relabel",
+  "label": "}",
+  "note": "right brace"
+ },
+ "1d7444cdeadc0c02": {
+  "idx": 198,
+  "emit": 65533,
+  "proposed": "¯",
+  "font": "txsys",
+  "wrong_chars": 39,
+  "decision": "reject",
+  "note": "vector accent"
+ },
+ "f564546f5a8969bf": {
+  "idx": 199,
+  "emit": 63331,
+  "proposed": "c",
+  "font": "AdvOT1ef757c0+f7",
+  "wrong_chars": 39,
+  "decision": "accept"
+ },
+ "268e21133a225688": {
+  "idx": 200,
+  "emit": 59271,
+  "proposed": "8",
+  "font": "DY108+ZEMKqu-132",
+  "wrong_chars": 39,
+  "decision": "relabel",
+  "label": "ϑ",
+  "note": "theta symbol"
+ },
+ "2019c5592ed9a915": {
+  "idx": 201,
+  "emit": 65533,
+  "proposed": ",",
+  "font": "MathematicalPi-Three",
+  "wrong_chars": 38,
+  "decision": "relabel",
+  "label": "∼",
+  "note": "tilde operator"
+ },
+ "c98b6717f92bb967": {
+  "idx": 202,
+  "emit": 65533,
+  "proposed": "¸",
+  "font": "XYDASH10",
+  "wrong_chars": 38,
+  "decision": "reject",
+  "note": "xy-pic line piece"
+ },
+ "097db3e2c1e31a0e": {
+  "idx": 203,
+  "emit": 65533,
+  "proposed": "×",
+  "font": "XYDASH10",
+  "wrong_chars": 38,
+  "decision": "reject",
+  "note": "xy-pic line piece"
+ },
+ "5cfb42fcce80e381": {
+  "idx": 204,
+  "emit": 57600,
+  "proposed": "o",
+  "font": "DanteMTPro-Italic+e1",
+  "wrong_chars": 38,
+  "decision": "relabel",
+  "label": "0",
+  "note": "DanteMTPro italic oldstyle zero"
+ },
+ "d193092c3863b915": {
+  "idx": 205,
+  "emit": 65533,
+  "proposed": "fl",
+  "font": "Roboto-Regular",
+  "wrong_chars": 37,
+  "decision": "accept"
+ },
+ "789eac5249e9a313": {
+  "idx": 206,
+  "emit": 63735,
+  "proposed": "∫",
+  "font": "Symbol",
+  "wrong_chars": 37,
+  "decision": "reject",
+  "note": "extender piece"
+ },
+ "2156ce5e0fbdeecc": {
+  "idx": 207,
+  "emit": 61745,
+  "proposed": "1",
+  "font": "AdvOT4f49f862+f1",
+  "wrong_chars": 37,
+  "decision": "accept"
+ },
+ "ce368132a8d67638": {
+  "idx": 208,
+  "emit": 63034,
+  "proposed": "2",
+  "font": "RbbnxgMyriadPro-Regular",
+  "wrong_chars": 37,
+  "decision": "accept"
+ },
+ "e7bae7b2558d1633": {
+  "idx": 209,
+  "emit": 63047,
+  "proposed": "4",
+  "font": "AGaramondPro-Regular",
+  "wrong_chars": 37,
+  "decision": "accept"
+ },
+ "82bcbf49143ef6a9": {
+  "idx": 210,
+  "emit": 65533,
+  "proposed": "˘",
+  "font": "AdvP4C4E59",
+  "wrong_chars": 36,
+  "decision": "accept"
+ },
+ "7734d80327176101": {
+  "idx": 211,
+  "emit": 65533,
+  "proposed": "¸",
+  "font": "XYDASH10",
+  "wrong_chars": 36,
+  "decision": "reject",
+  "note": "xy-pic line piece"
+ },
+ "a5185ca497005e84": {
+  "idx": 212,
+  "emit": 65533,
+  "proposed": "×",
+  "font": "XYDASH10",
+  "wrong_chars": 36,
+  "decision": "reject",
+  "note": "xy-pic line piece"
+ },
+ "5a38eabc6b8dd6fc": {
+  "idx": 213,
+  "emit": 65533,
+  "proposed": "|",
+  "font": "MTEX",
+  "wrong_chars": 36,
+  "decision": "relabel",
+  "label": "{",
+  "note": "big left brace"
+ },
+ "669c9fb680a47582": {
+  "idx": 214,
+  "emit": 65533,
+  "proposed": "|",
+  "font": "MTEX",
+  "wrong_chars": 36,
+  "decision": "relabel",
+  "label": "}",
+  "note": "big right brace"
+ },
+ "a77a2f51049c44c7": {
+  "idx": 215,
+  "emit": 65533,
+  "proposed": "↔",
+  "font": "txexs",
+  "wrong_chars": 36,
+  "decision": "reject",
+  "note": "brace tip piece"
+ },
+ "d6a732c2677077dc": {
+  "idx": 216,
+  "emit": 65533,
+  "proposed": "¬",
+  "font": "txexs",
+  "wrong_chars": 36,
+  "decision": "reject",
+  "note": "brace tip piece"
+ },
+ "193c3872e59fe3cb": {
+  "idx": 217,
+  "emit": 65533,
+  "proposed": ",",
+  "font": "txexs",
+  "wrong_chars": 36,
+  "decision": "reject",
+  "note": "brace tip piece"
+ },
+ "e93730520205f358": {
+  "idx": 218,
+  "emit": 65533,
+  "proposed": "↔",
+  "font": "txexs",
+  "wrong_chars": 36,
+  "decision": "reject",
+  "note": "brace tip piece"
+ },
+ "1eddc68a6a479958": {
+  "idx": 219,
+  "emit": 65533,
+  "proposed": "ff",
+  "font": "CharisSIL",
+  "wrong_chars": 36,
+  "decision": "accept"
+ },
+ "01810575e06ce15a": {
+  "idx": 220,
+  "emit": 65533,
+  "proposed": ":",
+  "font": "m1tii",
+  "wrong_chars": 35,
+  "decision": "accept"
+ },
+ "72af6cb92ccb76ef": {
+  "idx": 221,
+  "emit": 65533,
+  "proposed": "´",
+  "font": "AdvP4C4E5E",
+  "wrong_chars": 35,
+  "decision": "accept"
+ },
+ "875b34e94f45d378": {
+  "idx": 222,
+  "emit": 65533,
+  "proposed": "ff",
+  "font": "EBGaramond-Regular",
+  "wrong_chars": 35,
+  "decision": "accept"
+ },
+ "3c9b9f5e091a9b22": {
+  "idx": 223,
+  "emit": 65533,
+  "proposed": "¸",
+  "font": "XYDASH10",
+  "wrong_chars": 35,
+  "decision": "reject",
+  "note": "xy-pic line piece"
+ },
+ "cb647315805730d9": {
+  "idx": 224,
+  "emit": 65533,
+  "proposed": "↔",
+  "font": "XYDASH10",
+  "wrong_chars": 35,
+  "decision": "reject",
+  "note": "xy-pic line piece"
+ },
+ "df389472d0d19e55": {
+  "idx": 225,
+  "emit": 61557,
+  "proposed": "ℵ",
+  "font": "Wingdings3",
+  "wrong_chars": 35,
+  "decision": "relabel",
+  "label": "▶",
+  "note": "Wingdings 3 triangle bullet"
+ },
+ "e87502cf2540b0eb": {
+  "idx": 226,
+  "emit": 63050,
+  "proposed": "7",
+  "font": "AGaramondPro-Regular",
+  "wrong_chars": 35,
+  "decision": "accept"
+ },
+ "a029983b776f6760": {
+  "idx": 227,
+  "emit": 63049,
+  "proposed": "6",
+  "font": "AGaramondPro-Regular",
+  "wrong_chars": 35,
+  "decision": "accept"
+ },
+ "e5cc09953bef29c0": {
+  "idx": 228,
+  "emit": 65533,
+  "proposed": "(",
+  "font": "CMEX10",
+  "wrong_chars": 34,
+  "decision": "relabel",
+  "label": "{",
+  "note": "big left brace"
+ },
+ "0f95c05bf02c336a": {
+  "idx": 229,
+  "emit": 65533,
+  "proposed": "(",
+  "font": "CambriaMath",
+  "wrong_chars": 34,
+  "decision": "accept"
+ },
+ "ce3b5640ce5bb1d5": {
+  "idx": 230,
+  "emit": 65533,
+  "proposed": ")",
+  "font": "CambriaMath",
+  "wrong_chars": 34,
+  "decision": "accept"
+ },
+ "6154202b7bc39927": {
+  "idx": 231,
+  "emit": 65533,
+  "proposed": "]",
+  "font": "CMEX9",
+  "wrong_chars": 34,
+  "decision": "accept"
+ },
+ "a6aad44128d8d903": {
+  "idx": 232,
+  "emit": 65533,
+  "proposed": "[",
+  "font": "MathematicalPi-Three",
+  "wrong_chars": 34,
+  "decision": "accept"
+ },
+ "23370d91febc3b03": {
+  "idx": 233,
+  "emit": 65533,
+  "proposed": "]",
+  "font": "MathematicalPi-Three",
+  "wrong_chars": 34,
+  "decision": "accept"
+ },
+ "0cf07af068e524ac": {
+  "idx": 234,
+  "emit": 65533,
+  "proposed": "}",
+  "font": "MathematicalPi-Three",
+  "wrong_chars": 34,
+  "decision": "accept"
+ },
+ "f43d6b4a771f3ab0": {
+  "idx": 235,
+  "emit": 63349,
+  "proposed": "u",
+  "font": "AdvOT1ef757c0+f7",
+  "wrong_chars": 34,
+  "decision": "accept"
+ },
+ "3ff4e3a0f3cadc98": {
+  "idx": 236,
+  "emit": 65533,
+  "proposed": "★",
+  "font": "MSTT31c551",
+  "wrong_chars": 33,
+  "decision": "relabel",
+  "label": "➢",
+  "note": "arrowhead bullet"
+ },
+ "68e53cd9ff0771a5": {
+  "idx": 237,
+  "emit": 61565,
+  "proposed": "f",
+  "font": "Wingdings3",
+  "wrong_chars": 33,
+  "decision": "relabel",
+  "label": "▶",
+  "note": "Wingdings 3 triangle bullet"
+ },
+ "3b91c01855c20401": {
+  "idx": 238,
+  "emit": 65533,
+  "proposed": "⊗",
+  "font": "CMEX10",
+  "wrong_chars": 33,
+  "decision": "relabel",
+  "label": "⨂",
+  "note": "n-ary circled times"
+ },
+ "cf75fb480899bd84": {
+  "idx": 239,
+  "emit": 61559,
+  "proposed": "◆",
+  "font": "Wingdings-Regular",
+  "wrong_chars": 33,
+  "decision": "accept"
+ },
+ "9149dc1613c58031": {
+  "idx": 240,
+  "emit": 65533,
+  "proposed": "⃗",
+  "font": "CambriaMath",
+  "wrong_chars": 33,
+  "decision": "reject",
+  "note": "vector accent"
+ },
+ "fd7ca155f70887e9": {
+  "idx": 241,
+  "emit": 65533,
+  "proposed": "↕",
+  "font": "mmbnsm",
+  "wrong_chars": 33,
+  "decision": "relabel",
+  "label": "⟦",
+  "note": "white left square bracket"
+ },
+ "c84dea436300708d": {
+  "idx": 242,
+  "emit": 65533,
+  "proposed": "¶",
+  "font": "mmbnsm",
+  "wrong_chars": 33,
+  "decision": "relabel",
+  "label": "⟧",
+  "note": "white right square bracket"
+ },
+ "75077f663aa10bb6": {
+  "idx": 243,
+  "emit": 65533,
+  "proposed": "{",
+  "font": "MathematicalPi-Three",
+  "wrong_chars": 33,
+  "decision": "accept"
+ },
+ "6a03908cc6f00c89": {
+  "idx": 244,
+  "emit": 63048,
+  "proposed": "y",
+  "font": "AGaramondPro-Regular",
+  "wrong_chars": 33,
+  "decision": "relabel",
+  "label": "5",
+  "note": "AGaramond oldstyle five"
+ },
+ "4135fa1314134068": {
+  "idx": 245,
+  "emit": 61548,
+  "proposed": "£",
+  "font": "MTExtra",
+  "wrong_chars": 32,
+  "decision": "relabel",
+  "label": "ℓ",
+  "note": "script small l"
+ },
+ "d613413339a298ef": {
+  "idx": 246,
+  "emit": 65533,
+  "proposed": "¸",
+  "font": "XYDASH10",
+  "wrong_chars": 32,
+  "decision": "reject",
+  "note": "xy-pic line piece"
+ },
+ "b7fccf0a4c5bcd47": {
+  "idx": 247,
+  "emit": 65533,
+  "proposed": "{",
+  "font": "CMEX10",
+  "wrong_chars": 32,
+  "decision": "relabel",
+  "label": "⟨",
+  "note": "big left angle bracket"
+ },
+ "767b7ad297a370ea": {
+  "idx": 248,
+  "emit": 65533,
+  "proposed": "ft",
+  "font": "SourceSansPro-Italic",
+  "wrong_chars": 32,
+  "decision": "accept"
+ },
+ "4250451ccbf56b63": {
+  "idx": 249,
+  "emit": 65533,
+  "proposed": "¯",
+  "font": "MathematicalPi-Three",
+  "wrong_chars": 32,
+  "decision": "reject",
+  "note": "overline bar"
+ },
+ "83e520f96fd51caf": {
+  "idx": 250,
+  "emit": 59865,
+  "proposed": "Ø",
+  "font": "Academicons",
+  "wrong_chars": 32,
+  "decision": "reject",
+  "note": "ORCID icon, no character"
+ },
+ "ec4be55abaf60121": {
+  "idx": 251,
+  "emit": 61660,
+  "proposed": "Ο",
+  "font": "Wingdings",
+  "wrong_chars": 32,
+  "decision": "relabel",
+  "label": "➲",
+  "note": "Wingdings circled arrow bullet"
+ },
+ "632407f2606a797e": {
+  "idx": 252,
+  "emit": 61599,
+  "proposed": "Ÿ",
+  "font": "Wingdings-Regular",
+  "wrong_chars": 32,
+  "decision": "relabel",
+  "label": "•",
+  "note": "Wingdings bullet"
+ },
+ "8317a390ea4b2817": {
+  "idx": 253,
+  "emit": 65533,
+  "proposed": "–",
+  "font": "TTEDFEo00",
+  "wrong_chars": 32,
+  "decision": "relabel",
+  "label": "–",
+  "note": "en dash"
+ },
+ "e7f76953d024ac55": {
+  "idx": 254,
+  "emit": 63038,
+  "proposed": "6",
+  "font": "RbbnxgMyriadPro-Regular",
+  "wrong_chars": 32,
+  "decision": "accept"
+ },
+ "5d5426a5c4cefc2e": {
+  "idx": 255,
+  "emit": 63344,
+  "proposed": "r",
+  "font": "AdvOT1ef757c0+f7",
+  "wrong_chars": 32,
+  "decision": "relabel",
+  "label": "p",
+  "note": "small capital P"
+ },
+ "628ce64a4080fd8c": {
+  "idx": 256,
+  "emit": 61482,
+  "proposed": "*",
+  "font": "Wingdings-Regular",
+  "wrong_chars": 31,
+  "decision": "relabel",
+  "label": "✉",
+  "note": "Wingdings envelope"
+ },
+ "688cff188b208fe2": {
+  "idx": 257,
+  "emit": 65533,
+  "proposed": "†",
+  "font": "AdvPSMP1",
+  "wrong_chars": 31,
+  "decision": "accept"
+ },
+ "a93cb50aff129310": {
+  "idx": 258,
+  "emit": 65533,
+  "proposed": "(",
+  "font": "CMEX7",
+  "wrong_chars": 31,
+  "decision": "accept"
+ },
+ "f1377fa493e984f5": {
+  "idx": 259,
+  "emit": 65533,
+  "proposed": ")",
+  "font": "CMEX7",
+  "wrong_chars": 31,
+  "decision": "accept"
+ },
+ "973cff45ec4965ef": {
+  "idx": 260,
+  "emit": 65533,
+  "proposed": "≪",
+  "font": "AdvP4C4E74",
+  "wrong_chars": 30,
+  "decision": "relabel",
+  "label": "«",
+  "note": "left guillemet"
+ },
+ "01700125606e2ee2": {
+  "idx": 261,
+  "emit": 57364,
+  "proposed": "∂",
+  "font": "DY1+ZLPDPd-2",
+  "wrong_chars": 30,
+  "decision": "accept"
+ },
+ "4fab7a2f94410aa0": {
+  "idx": 262,
+  "emit": 65533,
+  "proposed": "¸",
+  "font": "XYATIP-Medium",
+  "wrong_chars": 30,
+  "decision": "reject",
+  "note": "xy-pic arrow tip"
+ },
+ "a043b952ac4f6dcd": {
+  "idx": 263,
+  "emit": 65533,
+  "proposed": "↔",
+  "font": "XYBTIP-Medium",
+  "wrong_chars": 30,
+  "decision": "reject",
+  "note": "xy-pic arrow tip"
+ },
+ "eaecfe9831ed5027": {
+  "idx": 264,
+  "emit": 65533,
+  "proposed": "[",
+  "font": "CMEX9",
+  "wrong_chars": 30,
+  "decision": "accept"
+ },
+ "ea3e1877975bb3fe": {
+  "idx": 265,
+  "emit": 65533,
+  "proposed": "(",
+  "font": "CMEX8",
+  "wrong_chars": 30,
+  "decision": "accept"
+ },
+ "b08f05641b84ce8f": {
+  "idx": 266,
+  "emit": 65533,
+  "proposed": ")",
+  "font": "CMEX8",
+  "wrong_chars": 30,
+  "decision": "accept"
+ },
+ "14f50a1b0375e804": {
+  "idx": 267,
+  "emit": 61516,
+  "proposed": "—",
+  "font": "MT-Extra",
+  "wrong_chars": 30,
+  "decision": "relabel",
+  "label": "⋯",
+  "note": "midline horizontal ellipsis"
+ },
+ "322bd1457226a827": {
+  "idx": 268,
+  "emit": 61517,
+  "proposed": "i",
+  "font": "MTExtra",
+  "wrong_chars": 30,
+  "decision": "relabel",
+  "label": "⋮",
+  "note": "vertical ellipsis"
+ },
+ "dfb6100170c82cdb": {
+  "idx": 269,
+  "emit": 65533,
+  "proposed": ".",
+  "font": "Calibri",
+  "wrong_chars": 30,
+  "decision": "accept"
+ },
+ "92c20d1126b3451b": {
+  "idx": 270,
+  "emit": 65533,
+  "proposed": ",",
+  "font": "SfrcktSrcghcMT2EXA",
+  "wrong_chars": 30,
+  "decision": "relabel",
+  "label": "‖",
+  "note": "double vertical line"
+ },
+ "951cf7cfe8c14adb": {
+  "idx": 271,
+  "emit": 61504,
+  "proposed": "∆",
+  "font": "MT-Extra",
+  "wrong_chars": 30,
+  "decision": "relabel",
+  "label": "≙",
+  "note": "estimates"
+ },
+ "8739208adc6d2b71": {
+  "idx": 272,
+  "emit": 65533,
+  "proposed": ",",
+  "font": "mmahvli",
+  "wrong_chars": 29,
+  "decision": "accept"
+ },
+ "c49e374347312061": {
+  "idx": 273,
+  "emit": 61477,
+  "proposed": "¯",
+  "font": "MT-Extra",
+  "wrong_chars": 29,
+  "decision": "reject",
+  "note": "tilde accent"
+ },
+ "2453691897e119cd": {
+  "idx": 274,
+  "emit": 60673,
+  "proposed": "{",
+  "font": "MTEX",
+  "wrong_chars": 29,
+  "decision": "relabel",
+  "label": "⟨",
+  "note": "left angle bracket"
+ },
+ "f30c2ec106aa066a": {
+  "idx": 275,
+  "emit": 60678,
+  "proposed": "}",
+  "font": "MTEX",
+  "wrong_chars": 29,
+  "decision": "relabel",
+  "label": "⟩",
+  "note": "right angle bracket"
+ },
+ "1297fd0c5fa0deed": {
+  "idx": 276,
+  "emit": 65533,
+  "proposed": "∗",
+  "font": "MT2SYS",
+  "wrong_chars": 29,
+  "decision": "relabel",
+  "label": "∗",
+  "note": "asterisk operator"
+ },
+ "96b110da658b7ae4": {
+  "idx": 277,
+  "emit": 65533,
+  "proposed": "fl",
+  "font": "EBGaramond-Regular",
+  "wrong_chars": 29,
+  "decision": "accept"
+ },
+ "c5b3e92b1277de7d": {
+  "idx": 278,
+  "emit": 65533,
+  "proposed": "(",
+  "font": "SymbolMT",
+  "wrong_chars": 29,
+  "decision": "accept"
+ },
+ "54c5e540372f9bd7": {
+  "idx": 279,
+  "emit": 65533,
+  "proposed": ")",
+  "font": "SymbolMT",
+  "wrong_chars": 29,
+  "decision": "accept"
+ },
+ "bcb6700c5efe9f25": {
+  "idx": 280,
+  "emit": 61506,
+  "proposed": "B",
+  "font": "EuclidMathOne",
+  "wrong_chars": 29,
+  "decision": "relabel",
+  "label": "ℬ",
+  "note": "script capital B"
+ },
+ "b6f56d0d997db317": {
+  "idx": 281,
+  "emit": 65533,
+  "proposed": "_",
+  "font": "CIDFont+F4",
+  "wrong_chars": 29,
+  "decision": "reject",
+  "note": "Arabic positional form"
+ },
+ "024f73d12ff8d4e6": {
+  "idx": 282,
+  "emit": 65533,
+  "proposed": "ft",
+  "font": "SourceSansPro-Regular",
+  "wrong_chars": 28,
+  "decision": "accept"
+ },
+ "667592eb86364d4c": {
+  "idx": 283,
+  "emit": 65533,
+  "proposed": "|",
+  "font": "MTEX",
+  "wrong_chars": 28,
+  "decision": "relabel",
+  "label": "}",
+  "note": "big right brace"
+ },
+ "927614f78353fa08": {
+  "idx": 284,
+  "emit": 65533,
+  "proposed": "¨",
+  "font": "txsys",
+  "wrong_chars": 28,
+  "decision": "accept"
+ },
+ "ab6e86d7382dbd5e": {
+  "idx": 285,
+  "emit": 65533,
+  "proposed": "↓",
+  "font": "TimesNewRomanPSMT",
+  "wrong_chars": 28,
+  "decision": "accept"
+ },
+ "f41c66f6788eecf8": {
+  "idx": 286,
+  "emit": 65533,
+  "proposed": "≡",
+  "font": "cmsy10",
+  "wrong_chars": 28,
+  "decision": "accept"
+ },
+ "eb24bfc8f056c1a2": {
+  "idx": 287,
+  "emit": 63051,
+  "proposed": "8",
+  "font": "AGaramondPro-Regular",
+  "wrong_chars": 28,
+  "decision": "accept"
+ },
+ "b05dc79f3473038c": {
+  "idx": 288,
+  "emit": 57609,
+  "proposed": "p",
+  "font": "DanteMTPro-Italic+e1",
+  "wrong_chars": 28,
+  "decision": "relabel",
+  "label": "9",
+  "note": "DanteMTPro italic oldstyle nine"
+ },
+ "e0b361a6a0b50812": {
+  "idx": 289,
+  "emit": 63725,
+  "proposed": "Ý",
+  "font": "SymbolMT",
+  "wrong_chars": 27,
+  "decision": "relabel",
+  "label": "⎝",
+  "note": "parenthesis lower hook"
+ },
+ "bae6bba04d518ede": {
+  "idx": 290,
+  "emit": 63723,
+  "proposed": "(",
+  "font": "SymbolMT",
+  "wrong_chars": 27,
+  "decision": "relabel",
+  "label": "⎛",
+  "note": "parenthesis upper hook"
+ },
+ "04dd8884bceb47b2": {
+  "idx": 291,
+  "emit": 63044,
+  "proposed": "1",
+  "font": "MinionPro-It",
+  "wrong_chars": 27,
+  "decision": "accept"
+ },
+ "6c2b0811d34de591": {
+  "idx": 292,
+  "emit": 65533,
+  "proposed": "ffi",
+  "font": "Roboto-Regular",
+  "wrong_chars": 27,
+  "decision": "accept"
+ },
+ "c58a0e0e4fe3919d": {
+  "idx": 293,
+  "emit": 61623,
+  "proposed": "¯",
+  "font": "MT-Extra",
+  "wrong_chars": 27,
+  "decision": "reject",
+  "note": "wide hat accent"
+ },
+ "4ad1015237096c74": {
+  "idx": 294,
+  "emit": 65533,
+  "proposed": "fl",
+  "font": "CharisSIL",
+  "wrong_chars": 27,
+  "decision": "accept"
+ },
+ "a93c6a4c6b02174c": {
+  "idx": 295,
+  "emit": 65533,
+  "proposed": "(",
+  "font": "cmex10",
+  "wrong_chars": 27,
+  "decision": "accept"
+ },
+ "c438053b563f2985": {
+  "idx": 296,
+  "emit": 65533,
+  "proposed": ")",
+  "font": "cmex10",
+  "wrong_chars": 27,
+  "decision": "accept"
+ },
+ "863e6c3f2e80d030": {
+  "idx": 297,
+  "emit": 63044,
+  "proposed": "ι",
+  "font": "AdvOTa51af33d+f6",
+  "wrong_chars": 27,
+  "decision": "relabel",
+  "label": "1",
+  "note": "figure one"
+ },
+ "e29110bbcdc54760": {
+  "idx": 298,
+  "emit": 65533,
+  "proposed": "|",
+  "font": "BLEX",
+  "wrong_chars": 26,
+  "decision": "relabel",
+  "label": "{",
+  "note": "big left brace"
+ },
+ "07f2762e40253d75": {
+  "idx": 299,
+  "emit": 65533,
+  "proposed": "∂",
+  "font": "mmatii",
+  "wrong_chars": 26,
+  "decision": "accept"
+ },
+ "9469683625de0d1c": {
+  "idx": 300,
+  "emit": 65533,
+  "proposed": "⊕",
+  "font": "CMEX10",
+  "wrong_chars": 26,
+  "decision": "relabel",
+  "label": "⨁",
+  "note": "n-ary circled plus"
+ },
+ "a6ea1c40c66b12ed": {
+  "idx": 301,
+  "emit": 65533,
+  "proposed": "{",
+  "font": "CMEX8",
+  "wrong_chars": 26,
+  "decision": "accept"
+ },
+ "32e3990866c525bb": {
+  "idx": 302,
+  "emit": 65533,
+  "proposed": "{",
+  "font": "CMEX10",
+  "wrong_chars": 26,
+  "decision": "relabel",
+  "label": "⟨",
+  "note": "big left angle bracket"
+ },
+ "ab833ec59ac6c01e": {
+  "idx": 303,
+  "emit": 63282,
+  "proposed": "2",
+  "font": "MinionExp-Regular",
+  "wrong_chars": 26,
+  "decision": "accept"
+ },
+ "449a3e5636e0a77a": {
+  "idx": 304,
+  "emit": 65533,
+  "proposed": "∩",
+  "font": "AvantGardeITCbyBT-Book",
+  "wrong_chars": 26,
+  "decision": "reject",
+  "note": "plain letter in an unmapped text layer"
+ },
+ "f99df5782b258c8c": {
+  "idx": 305,
+  "emit": 65533,
+  "proposed": ",",
+  "font": "MTMIDDB",
+  "wrong_chars": 26,
+  "decision": "accept"
+ },
+ "e57893e26039fbd8": {
+  "idx": 306,
+  "emit": 65533,
+  "proposed": "(",
+  "font": "MTEXB",
+  "wrong_chars": 26,
+  "decision": "accept"
+ },
+ "820e83742a34db9f": {
+  "idx": 307,
+  "emit": 65533,
+  "proposed": ")",
+  "font": "MTEXB",
+  "wrong_chars": 26,
+  "decision": "accept"
+ },
+ "30d5dbbde67ea2f5": {
+  "idx": 308,
+  "emit": 57608,
+  "proposed": "3",
+  "font": "DanteMTPro-Italic+e1",
+  "wrong_chars": 26,
+  "decision": "relabel",
+  "label": "8",
+  "note": "DanteMTPro italic oldstyle eight"
+ },
+ "dd8875bda166dc08": {
+  "idx": 309,
+  "emit": 65533,
+  "proposed": "⁄",
+  "font": "Cambria",
+  "wrong_chars": 25,
+  "decision": "accept"
+ },
+ "5bfed94c39d562c4": {
+  "idx": 310,
+  "emit": 63045,
+  "proposed": "z",
+  "font": "MinionPro-Bold",
+  "wrong_chars": 25,
+  "decision": "relabel",
+  "label": "2",
+  "note": "MinionPro bold figure two"
+ },
+ "d46ac8c0fd1dd8f1": {
+  "idx": 311,
+  "emit": 65533,
+  "proposed": "i",
+  "font": "CMEX7",
+  "wrong_chars": 25,
+  "decision": "relabel",
+  "label": "(",
+  "note": "big left parenthesis"
+ },
+ "64bf1d1fd10d9173": {
+  "idx": 312,
+  "emit": 65533,
+  "proposed": ")",
+  "font": "CMEX7",
+  "wrong_chars": 25,
+  "decision": "accept"
+ },
+ "f2dd1fbcc4f64e0b": {
+  "idx": 313,
+  "emit": 65533,
+  "proposed": "\\",
+  "font": "XYBTIP10",
+  "wrong_chars": 25,
+  "decision": "reject",
+  "note": "xy-pic piece"
+ },
+ "cb304956a7f5a69b": {
+  "idx": 314,
+  "emit": 65533,
+  "proposed": "]",
+  "font": "CMEX9",
+  "wrong_chars": 25,
+  "decision": "accept"
+ },
+ "9b7616b292414e10": {
+  "idx": 315,
+  "emit": 65533,
+  "proposed": "¯",
+  "font": "CMEX8",
+  "wrong_chars": 25,
+  "decision": "reject",
+  "note": "wide tilde accent"
+ },
+ "20c1106a5b8bb94f": {
+  "idx": 316,
+  "emit": 63035,
+  "proposed": "3",
+  "font": "RbbnxgMyriadPro-Regular",
+  "wrong_chars": 25,
+  "decision": "accept"
+ },
+ "e52252f9a7149a92": {
+  "idx": 317,
+  "emit": 63335,
+  "proposed": "g",
+  "font": "AdvOT1ef757c0+f7",
+  "wrong_chars": 25,
+  "decision": "accept"
+ },
+ "1c021288ec54bba6": {
+  "idx": 318,
+  "emit": 63334,
+  "proposed": "r",
+  "font": "AdvOT1ef757c0+f7",
+  "wrong_chars": 25,
+  "decision": "relabel",
+  "label": "f",
+  "note": "small capital F"
+ },
+ "622ef38cd3b3df2d": {
+  "idx": 319,
+  "emit": 61525,
+  "proposed": "Η",
+  "font": "EuclidMathOne",
+  "wrong_chars": 25,
+  "decision": "relabel",
+  "label": "𝒰",
+  "note": "script capital U"
+ },
+ "19829d7c09d6262f": {
+  "idx": 320,
+  "emit": 65533,
+  "proposed": ",",
+  "font": "CIDFont+F4",
+  "wrong_chars": 25,
+  "decision": "reject",
+  "note": "Arabic positional form"
+ },
+ "f88e6008f94a52ca": {
+  "idx": 321,
+  "emit": 65533,
+  "proposed": ",",
+  "font": "PalatinoLinotype-Roman",
+  "wrong_chars": 25,
+  "decision": "accept"
+ },
+ "a6ad46f89cf98cc8": {
+  "idx": 322,
+  "emit": 57362,
+  "proposed": "r",
+  "font": "DanteMTPro+e0",
+  "wrong_chars": 25,
+  "decision": "relabel",
+  "label": "f",
+  "note": "small capital F"
+ },
+ "3dc46baa76721d88": {
+  "idx": 323,
+  "emit": 65533,
+  "proposed": "¸",
+  "font": "CMEX10",
+  "wrong_chars": 24,
+  "decision": "relabel",
+  "label": "⋃",
+  "note": "n-ary union"
+ },
+ "9bd7181deb31b09b": {
+  "idx": 324,
+  "emit": 65533,
+  "proposed": "■",
+  "font": "AdvTimes",
+  "wrong_chars": 24,
+  "decision": "accept"
+ },
+ "84d848a75e5165a3": {
+  "idx": 325,
+  "emit": 63736,
+  "proposed": ")",
+  "font": "SymbolMT",
+  "wrong_chars": 24,
+  "decision": "relabel",
+  "label": "⎠",
+  "note": "parenthesis lower hook"
+ },
+ "5db238f9060c2cfc": {
+  "idx": 326,
+  "emit": 63734,
+  "proposed": "Á",
+  "font": "SymbolMT",
+  "wrong_chars": 24,
+  "decision": "relabel",
+  "label": "⎞",
+  "note": "parenthesis upper hook"
+ },
+ "f16f346815b8ad13": {
+  "idx": 327,
+  "emit": 65533,
+  "proposed": "[",
+  "font": "CMEX9",
+  "wrong_chars": 24,
+  "decision": "accept"
+ },
+ "294a79240f72f0f9": {
+  "idx": 328,
+  "emit": 65533,
+  "proposed": "{",
+  "font": "BLEX",
+  "wrong_chars": 24,
+  "decision": "accept"
+ },
+ "ae5abcf59d13c05a": {
+  "idx": 329,
+  "emit": 65533,
+  "proposed": "}",
+  "font": "BLEX",
+  "wrong_chars": 24,
+  "decision": "accept"
+ },
+ "129a37396973775f": {
+  "idx": 330,
+  "emit": 65533,
+  "proposed": "¡",
+  "font": "txex",
+  "wrong_chars": 24,
+  "decision": "reject",
+  "note": "vertical extender piece"
+ },
+ "504105a32577358f": {
+  "idx": 331,
+  "emit": 65533,
+  "proposed": "[",
+  "font": "CMEX9",
+  "wrong_chars": 24,
+  "decision": "accept"
+ },
+ "22a29b8e2d2cc686": {
+  "idx": 332,
+  "emit": 65533,
+  "proposed": "⟩",
+  "font": "HardingText-Regular4",
+  "wrong_chars": 24,
+  "decision": "relabel",
+  "label": "⟩",
+  "note": "right angle bracket"
+ },
+ "6df3cee90f7aa75d": {
+  "idx": 333,
+  "emit": 65533,
+  "proposed": "=",
+  "font": "Calibri",
+  "wrong_chars": 24,
+  "decision": "accept"
+ },
+ "86bd6916c4acc6c4": {
+  "idx": 334,
+  "emit": 63033,
+  "proposed": "0",
+  "font": "RbbnxgMyriadPro-Regular",
+  "wrong_chars": 24,
+  "decision": "accept"
+ },
+ "e9d249a72def7592": {
+  "idx": 335,
+  "emit": 65533,
+  "proposed": "®",
+  "font": "FZSSK--GBK1-0-76",
+  "wrong_chars": 24,
+  "decision": "reject",
+  "note": "CJK letter in an unmapped text layer"
  }
 }
