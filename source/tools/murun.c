@@ -4671,6 +4671,79 @@ static void ffi_Page_toStructuredText(js_State *J)
 	js_newuserdata(J, "fz_stext_page", text, ffi_gc_fz_stext_page);
 }
 
+/* Fork addition: graphics summary (see mupdf/fitz/graphics-summary.h) as an array of numbers. */
+static void ffi_pushgraphicssummary(js_State *J, fz_buffer *buf)
+{
+	fz_context *ctx = js_getcontext(J);
+	unsigned char *data = NULL;
+	size_t i, n = fz_buffer_storage(ctx, buf, &data) / sizeof(float);
+	float v;
+	js_newarray(J);
+	for (i = 0; i < n; i++)
+	{
+		memcpy(&v, data + i * sizeof(float), sizeof v);
+		js_pushnumber(J, v);
+		js_setindex(J, -2, (int)i);
+	}
+}
+
+static void ffi_Page_getGraphicsSummary(js_State *J)
+{
+	fz_context *ctx = js_getcontext(J);
+	fz_page *page = ffi_topage(J, 0);
+	int max_records = js_iscoercible(J, 1) ? js_tointeger(J, 1) : 0;
+	fz_buffer *buf = NULL;
+
+	fz_try(ctx)
+		buf = fz_new_graphics_summary_from_page(ctx, page, max_records);
+	fz_catch(ctx)
+		rethrow(J);
+
+	if (js_try(J)) {
+		fz_drop_buffer(ctx, buf);
+		js_throw(J);
+	}
+	ffi_pushgraphicssummary(J, buf);
+	js_endtry(J);
+	fz_drop_buffer(ctx, buf);
+}
+
+static void ffi_Page_toStructuredTextWithGraphics(js_State *J)
+{
+	fz_context *ctx = js_getcontext(J);
+	fz_page *page = ffi_topage(J, 0);
+	const char *options = js_iscoercible(J, 1) ? js_tostring(J, 1) : NULL;
+	int max_records = js_iscoercible(J, 2) ? js_tointeger(J, 2) : 0;
+	fz_stext_options so;
+	fz_stext_page *text = NULL;
+	fz_buffer *buf = NULL;
+
+	fz_try(ctx) {
+		fz_parse_stext_options(ctx, &so, options);
+		text = fz_new_stext_page_with_graphics_summary(ctx, page, &so, max_records, &buf);
+	}
+	fz_catch(ctx)
+		rethrow(J);
+
+	/* Build the summary while we still own both objects; wrap the page last. */
+	if (js_try(J)) {
+		fz_drop_buffer(ctx, buf);
+		fz_drop_stext_page(ctx, text);
+		js_throw(J);
+	}
+	ffi_pushgraphicssummary(J, buf);
+	js_endtry(J);
+	fz_drop_buffer(ctx, buf);
+
+	/* stack: summary */
+	js_newarray(J);
+	js_rot2(J); /* stack: array, summary */
+	js_setindex(J, -2, 1);
+	js_getregistry(J, "fz_stext_page");
+	js_newuserdata(J, "fz_stext_page", text, ffi_gc_fz_stext_page);
+	js_setindex(J, -2, 0);
+}
+
 typedef struct {
 	js_State *J;
 	int max_hits;
@@ -12271,6 +12344,8 @@ int murun_main(int argc, char **argv)
 		jsB_propfun(J, "Page.toPixmap", ffi_Page_toPixmap, 4);
 		jsB_propfun(J, "Page.toDisplayList", ffi_Page_toDisplayList, 1);
 		jsB_propfun(J, "Page.toStructuredText", ffi_Page_toStructuredText, 1);
+		jsB_propfun(J, "Page.toStructuredTextWithGraphics", ffi_Page_toStructuredTextWithGraphics, 2);
+		jsB_propfun(J, "Page.getGraphicsSummary", ffi_Page_getGraphicsSummary, 1);
 		jsB_propfun(J, "Page.search", ffi_Page_search, 2);
 		jsB_propfun(J, "Page.getLinks", ffi_Page_getLinks, 0);
 		jsB_propfun(J, "Page.createLink", ffi_Page_createLink, 2);

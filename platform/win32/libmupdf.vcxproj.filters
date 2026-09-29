@@ -702,6 +702,9 @@
     <ClCompile Include="..\..\source\fitz\json.c">
       <Filter>fitz</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\fitz\graphics-summary.c">
+      <Filter>fitz</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\source\fitz\known-glyph-outlines.c">
       <Filter>fitz</Filter>
     </ClCompile>

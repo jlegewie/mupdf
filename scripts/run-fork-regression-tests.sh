@@ -360,3 +360,10 @@ print("OK: ToUnicode Private Use value kept against a disagreeing glyph name");
 JS
 	"$MUTOOL" run "$script" "$TUPUA_SAMPLE"
 fi
+
+# Graphics summary device: structured text built through the graphics-summary
+# tee must be identical to plain toStructuredText on every corpus page (several
+# option sets), and every summary must be well formed. Damaged files that cannot
+# be opened are skipped by the script; the smoke pass above covers crashes.
+printf '==> graphics-summary equivalence check\n'
+"$MUTOOL" run "$ROOT/scripts/graphics-summary-check.js" --max-pages 20 "${files[@]}"

@@ -94,6 +94,7 @@ extern "C" {
 
 #include "mupdf/fitz/deskew.h"
 #include "mupdf/fitz/barcode.h"
+#include "mupdf/fitz/graphics-summary.h"
 
 #ifdef __cplusplus
 }
