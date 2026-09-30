@@ -535,6 +535,15 @@ function fromBuffer(ptr: Pointer<"fz_buffer">): Uint8Array {
 	return libmupdf.HEAPU8.slice(data, data + size)
 }
 
+// Copies a graphics summary out of the heap and drops the buffer.
+function fromGraphicsSummary(ptr: Pointer<"fz_buffer">): Float32Array {
+	try {
+		return new Float32Array(fromBuffer(ptr).buffer)
+	} finally {
+		libmupdf._wasm_drop_buffer(ptr)
+	}
+}
+
 function fromLayerConfigUIInfo(ptr: Pointer<"pdf_layer_config_ui">): Object {
 	return {
 		text: libmupdf._wasm_pdf_layer_config_ui_get_text(ptr),
@@ -2339,6 +2348,19 @@ export class Page extends Userdata<"any_page"> {
 	toStructuredText(options = "") {
 		checkType(options, "string")
 		return new StructuredText(libmupdf._wasm_new_stext_page_from_page(this.pointer, STRING(options)))
+	}
+
+	// Fork addition: graphics summary (format in include/mupdf/fitz/graphics-summary.h).
+	toStructuredTextWithGraphics(options = "", maxRecords = 0): [StructuredText, Float32Array] {
+		checkType(options, "string")
+		checkType(maxRecords, "number")
+		let stext = new StructuredText(libmupdf._wasm_new_stext_page_with_graphics(this.pointer, STRING(options), maxRecords))
+		return [ stext, fromGraphicsSummary(libmupdf._wasm_take_graphics_summary()) ]
+	}
+
+	getGraphicsSummary(maxRecords = 0): Float32Array {
+		checkType(maxRecords, "number")
+		return fromGraphicsSummary(libmupdf._wasm_new_graphics_summary_from_page(this.pointer, maxRecords))
 	}
 
 	getLinks() {

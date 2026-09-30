@@ -154,8 +154,10 @@ begin_record(fz_context *ctx, fz_graphics_summary_device *dev, fz_graphics_summa
 		return dev->tile_rec;
 	}
 
+	if (dev->in_mask)
+		return NULL;
 	dev->seen[kind]++;
-	if (dev->failed || dev->in_mask)
+	if (dev->failed)
 		return NULL;
 	clipped = fz_intersect_rect(bbox, fz_device_current_scissor(ctx, &dev->super));
 	clipped = fz_intersect_rect(clipped, dev->area);
@@ -187,11 +189,23 @@ begin_record(fz_context *ctx, fz_graphics_summary_device *dev, fz_graphics_summa
 	return rec;
 }
 
+/* Called from the error handler of a recording step: stops recording and
+ * drops the record the step may have left partly filled (count is the
+ * record count before the step). The summary is flagged incomplete. */
+static void
+stop_recording(fz_context *ctx, fz_graphics_summary_device *dev, int count)
+{
+	fz_report_error(ctx);
+	dev->count = count;
+	dev->failed = 1;
+}
+
 static void
 record_path(fz_context *ctx, fz_graphics_summary_device *dev, const fz_path *path, const fz_stroke_state *stroke, int even_odd,
 	fz_matrix ctm, fz_colorspace *cs, const float *color, float alpha, fz_color_params params)
 {
 	fz_graphics_summary_kind kind = stroke ? FZ_GRAPHICS_SUMMARY_STROKE_PATH : FZ_GRAPHICS_SUMMARY_FILL_PATH;
+	int count = dev->count;
 	fz_try(ctx)
 	{
 		float *rec = begin_record(ctx, dev, kind, fz_bound_path(ctx, path, stroke, ctm));
@@ -215,16 +229,14 @@ record_path(fz_context *ctx, fz_graphics_summary_device *dev, const fz_path *pat
 		}
 	}
 	fz_catch(ctx)
-	{
-		fz_report_error(ctx);
-		dev->failed = 1;
-	}
+		stop_recording(ctx, dev, count);
 }
 
 static void
 record_image(fz_context *ctx, fz_graphics_summary_device *dev, fz_graphics_summary_kind kind, fz_image *image, fz_matrix ctm,
 	fz_colorspace *cs, const float *color, float alpha, fz_color_params params)
 {
+	int count = dev->count;
 	fz_try(ctx)
 	{
 		float *rec = begin_record(ctx, dev, kind, fz_transform_rect(fz_unit_rect, ctm));
@@ -239,10 +251,7 @@ record_image(fz_context *ctx, fz_graphics_summary_device *dev, fz_graphics_summa
 		}
 	}
 	fz_catch(ctx)
-	{
-		fz_report_error(ctx);
-		dev->failed = 1;
-	}
+		stop_recording(ctx, dev, count);
 }
 
 /* Device callbacks: forward first, then record. */
@@ -319,6 +328,7 @@ gs_ignore_text(fz_context *ctx, fz_device *d, const fz_text *text, fz_matrix ctm
 static void
 gs_fill_shade(fz_context *ctx, fz_device *d, fz_shade *shade, fz_matrix ctm, float alpha, fz_color_params params)
 {
+	int count = GS(d)->count;
 	if (PASS(d))
 		fz_fill_shade(ctx, PASS(d), shade, ctm, alpha, params);
 	fz_try(ctx)
@@ -328,10 +338,7 @@ gs_fill_shade(fz_context *ctx, fz_device *d, fz_shade *shade, fz_matrix ctm, flo
 			rec[7] = fz_clamp(alpha, 0, 1) * 255;
 	}
 	fz_catch(ctx)
-	{
-		fz_report_error(ctx);
-		GS(d)->failed = 1;
-	}
+		stop_recording(ctx, GS(d), count);
 }
 
 static void
@@ -429,6 +436,7 @@ static void
 gs_end_tile(fz_context *ctx, fz_device *d)
 {
 	fz_graphics_summary_device *dev = GS(d);
+	int count = dev->count;
 
 	if (dev->pass_skip)
 	{
@@ -458,10 +466,7 @@ gs_end_tile(fz_context *ctx, fz_device *d)
 		}
 	}
 	fz_catch(ctx)
-	{
-		fz_report_error(ctx);
-		dev->failed = 1;
-	}
+		stop_recording(ctx, dev, count);
 }
 
 static void
@@ -521,14 +526,10 @@ gs_end_metatext(fz_context *ctx, fz_device *d)
 }
 
 static void
-gs_close_device(fz_context *ctx, fz_device *d)
+write_summary(fz_context *ctx, fz_graphics_summary_device *dev)
 {
-	fz_graphics_summary_device *dev = GS(d);
 	float header[FZ_GRAPHICS_SUMMARY_HEADER] = { 0 };
 	fz_buffer *buf;
-
-	if (dev->passthrough)
-		fz_close_device(ctx, dev->passthrough);
 
 	header[0] = FZ_GRAPHICS_SUMMARY_VERSION;
 	header[1] = (float)dev->count;
@@ -544,6 +545,7 @@ gs_close_device(fz_context *ctx, fz_device *d)
 	header[11] = dev->area.y0;
 	header[12] = dev->area.x1;
 	header[13] = dev->area.y1;
+	header[14] = (float)dev->failed;
 
 	buf = fz_new_buffer(ctx, sizeof header + (size_t)dev->count * STRIDE * sizeof(float) + (dev->overflow ? sizeof dev->grid : 0));
 	fz_try(ctx)
@@ -566,6 +568,14 @@ gs_close_device(fz_context *ctx, fz_device *d)
 	}
 	else
 		fz_drop_buffer(ctx, buf);
+}
+
+static void
+gs_close_device(fz_context *ctx, fz_device *d)
+{
+	if (GS(d)->passthrough)
+		fz_close_device(ctx, GS(d)->passthrough);
+	write_summary(ctx, GS(d));
 }
 
 static void
@@ -666,6 +676,7 @@ fz_new_stext_page_with_graphics_summary(fz_context *ctx, fz_page *page, const fz
 	fz_var(dev);
 	fz_var(buf);
 
+	*summary = NULL;
 	if (page == NULL)
 		return NULL;
 
@@ -678,6 +689,18 @@ fz_new_stext_page_with_graphics_summary(fz_context *ctx, fz_page *page, const fz
 		dev = fz_new_graphics_summary_device(ctx, bounds, max_records, stext, &buf);
 		fz_run_page_contents(ctx, page, dev, fz_identity, NULL);
 		fz_close_device(ctx, dev); /* closes the stext device too */
+		if (!buf)
+		{
+			/* An error in the stext device that the interpreter
+			 * continued past (a syntax or try-later error) disabled
+			 * it, and with it the summary device (the error passes
+			 * through the summary device's call), so neither was
+			 * closed; plain extraction leaves the stext device
+			 * unclosed the same way. Write what was recorded before
+			 * the error, flagged incomplete. */
+			GS(dev)->failed = 1;
+			write_summary(ctx, GS(dev));
+		}
 	}
 	fz_always(ctx)
 	{

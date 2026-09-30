@@ -362,7 +362,8 @@ records them in C instead (`include/mupdf/fitz/graphics-summary.h` documents the
   (clipped to the current clip and the page), flags (axis-aligned rectangle, has curves,
   even-odd, clipped, tiled), RGB colour, alpha, segment count, stroke width, image size and a hash of
   the compressed image data (to recognise a logo drawn on many pages);
-- soft-mask definitions are skipped (not visible graphics); annotations are not included;
+- soft-mask definitions are skipped (not visible graphics: their contents are neither recorded
+  nor counted in the header's "seen" totals); annotations are not included;
 - a tiling-pattern fill that the interpreter runs as a tile (`begin_tile`/`end_tile`: the cell
   is drawn once, in pattern space, and the device repeats it) becomes one record flagged
   *tiled* whose bbox is the painted area — the tile area mapped to device space, clipped —
@@ -385,7 +386,16 @@ records them in C instead (`include/mupdf/fitz/graphics-summary.h` documents the
   ignores the extra image calls in that mode. What loading can still change is what it
   changes for structured text without `ignore-actualtext`: a broken image XObject now raises
   its load error, and an image drawn under an ExtGState soft mask runs the mask's content
-  (which reaches the structured-text device, as it does for masked paths and text).
+  (which reaches the structured-text device, as it does for masked paths and text);
+- a recording error (out of memory, a failed colour conversion) stops recording for the rest of
+  the page and drops the record it left half-filled; the header's *incomplete* flag (`[14]`)
+  says so. An error in the passthrough device disables it for the rest of the page, as in plain
+  extraction, and since the error passes through the summary device's call, disables that too.
+  Only errors the interpreter continues past (in PDF, syntax and try-later errors) get that far:
+  `fz_new_stext_page_with_graphics_summary` then still writes the summary recorded up to the
+  error, flagged incomplete, so a returned stext page always comes with a summary. Any other
+  error from the structured-text device (out of memory, format, argument, …) aborts the page and
+  the call throws, exactly as plain extraction does.
 
 `fz_new_stext_page_with_graphics_summary` builds the structured text exactly like
 `fz_new_stext_page_from_page` (same bounds, device and run call) with the summary device as a
@@ -393,7 +403,9 @@ tee, so both come from one interpretation. `fz_new_graphics_summary_from_page` p
 summary alone.
 
 Exposed as WASM exports (`wasm_new_stext_page_with_graphics` + `wasm_take_graphics_summary`,
-`wasm_new_graphics_summary_from_page`) and as `mutool run` bindings
+`wasm_new_graphics_summary_from_page`), wrapped in `platform/wasm/lib/mupdf.ts` as
+`Page.toStructuredTextWithGraphics(options, maxRecords)` → `[StructuredText, Float32Array]` and
+`Page.getGraphicsSummary(maxRecords)` → `Float32Array`, and as `mutool run` bindings
 (`Page.toStructuredTextWithGraphics(options, maxRecords)` → `[stext, summary]`,
 `Page.getGraphicsSummary(maxRecords)`).
 
@@ -402,7 +414,8 @@ Exposed as WASM exports (`wasm_new_stext_page_with_graphics` + `wasm_take_graphi
 formed. It first checks pages it builds in memory: an image gives the same record standalone
 and through the tee under every option set (including `ignore-actualtext`), and tiling-pattern
 fills (a whole page, a region whose clip excludes the cell, a pattern nested in a cell) give one
-tiled record covering the painted area. `make fork-regression-test` runs it over the regression
+tiled record covering the painted area, and a soft-mask definition adds neither records nor
+"seen" counts. `make fork-regression-test` runs it over the regression
 corpus. Verified on 4,151 pages of 400 production PDFs natively and 1,094 pages in the WASM
 build (identical text; adding the tee costs ≈ 0 ms mean and 0.9 ms p95 per page over the stext
 build).

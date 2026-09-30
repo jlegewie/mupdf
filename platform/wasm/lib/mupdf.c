@@ -1187,7 +1187,9 @@ fz_stext_page * wasm_new_stext_page_from_page(fz_page *page, char *option_string
 // wasm_new_stext_page_with_graphics builds the structured text exactly like
 // wasm_new_stext_page_from_page and, in the same pass over the page contents,
 // a graphics summary that the caller collects with wasm_take_graphics_summary
-// (ownership passes to the caller; drop it with wasm_drop_buffer).
+// (ownership passes to the caller; drop it with wasm_drop_buffer). The summary
+// is always there when the structured text is returned. Page.toStructuredTextWithGraphics
+// and Page.getGraphicsSummary in mupdf.ts wrap these as Float32Arrays.
 static fz_buffer *pending_graphics_summary = NULL;
 
 EXPORT

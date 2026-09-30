@@ -48,12 +48,21 @@
 		[3]  fill paths seen    [4] stroke paths seen
 		[5]  images seen        [6] image masks seen   [7] shadings seen
 		     (counts include primitives that were clipped away or only
-		     added to the overflow grid; a tiling-pattern fill counts
-		     once, as its tiled record)
+		     added to the overflow grid, but not the contents of
+		     soft-mask definitions; a tiling-pattern fill counts once,
+		     as its tiled record)
 		[8]  1 if the record cap was reached, else 0
 		[9]  overflow grid size N (N x N cells over the area), 0 if none
 		[10..13] area x0, y0, x1, y1 (the page bounds)
-		[14..15] reserved (0)
+		[14] 1 if the summary is incomplete, else 0: recording stopped
+		     at an error (for example out of memory or a failed colour
+		     conversion), or an error in the passthrough device that
+		     the interpreter continued past disabled both devices;
+		     the records end at that point
+		[15] reserved (0)
+
+	Soft-mask definitions are not visible graphics: primitives drawn
+	between begin_mask and end_mask are neither recorded nor counted.
 
 	Records (FZ_GRAPHICS_SUMMARY_STRIDE floats each), in drawing order:
 		[0]  kind (fz_graphics_summary_kind)
@@ -144,6 +153,18 @@ fz_buffer *fz_new_graphics_summary_from_page(fz_context *ctx, fz_page *page, int
 	Build a structured-text page exactly as fz_new_stext_page_from_page
 	does and, from the same interpretation of the page contents, its
 	graphics summary (returned in *summary, owned by the caller).
+
+	An error in the structured-text device disables it for the rest of
+	the page. If the interpreter continues past the error (the PDF
+	interpreter does so for syntax and try-later errors), the call
+	returns the structured text exactly as fz_new_stext_page_from_page
+	does, and the summary holds what was recorded before the error,
+	flagged incomplete (header[14]). Any other error (out of memory,
+	format, argument, ...) aborts the page and the call throws, as
+	fz_new_stext_page_from_page does.
+
+	*summary is set whenever the function returns: to NULL with a NULL
+	page (the function then returns NULL), otherwise to the summary.
 */
 fz_stext_page *fz_new_stext_page_with_graphics_summary(fz_context *ctx, fz_page *page, const fz_stext_options *options, int max_records, fz_buffer **summary);
 

@@ -10,7 +10,8 @@
 //
 // Before the files, synthetic pages built in memory check specific summaries: an
 // image is recorded identically standalone and through the tee under every option
-// set, and a tiling-pattern fill gives one tiled record covering the painted area.
+// set, a tiling-pattern fill gives one tiled record covering the painted area, and
+// the contents of a soft-mask definition are neither recorded nor counted.
 
 var OPTION_SETS = [
 	"preserve-whitespace",
@@ -36,6 +37,8 @@ function checkSummary(s, bounds) {
 	var expected = HEADER + count * STRIDE + (s[8] ? GRID * GRID : 0);
 	if (s.length !== expected) return "length " + s.length + " != " + expected;
 	if (s[8] && gridN !== GRID) return "overflow without grid";
+	if (s[14] !== 0 && s[14] !== 1) return "bad incomplete flag " + s[14];
+	if (s[15] !== 0) return "reserved header field set";
 	var seen = s[3] + s[4] + s[5] + s[6] + s[7];
 	if (count > seen) return "more records than primitives seen";
 	var eps = 0.5;
@@ -105,6 +108,13 @@ function checkSynthetic() {
 	doc.insertPage(-1, doc.addPage([0, 0, 200, 200], 0, patRes, "/Pattern cs /P1 scn 0 0 200 200 re f 1 0 0 rg 10 10 20 20 re f"));
 	// A pattern nested in a pattern cell.
 	doc.insertPage(-1, doc.addPage([0, 0, 200, 200], 0, patRes, "/Pattern cs /P2 scn 20 20 100 60 re f"));
+	// A red rectangle under a luminosity soft mask whose definition draws two paths.
+	var maskForm = doc.addStream("1 g 0 0 200 200 re f 0 g 0 0 10 10 re f", {
+		Type: "XObject", Subtype: "Form", BBox: [0, 0, 200, 200], Resources: {},
+		Group: { S: "Transparency", CS: "DeviceGray" }
+	});
+	var maskRes = doc.addObject({ ExtGState: { GS0: { SMask: { Type: "Mask", S: "Luminosity", G: maskForm } } } });
+	doc.insertPage(-1, doc.addPage([0, 0, 200, 200], 0, maskRes, "/GS0 gs 1 0 0 rg 10 10 20 20 re f"));
 
 	// Image: the same record from the standalone device and the tee under every option set.
 	var page = doc.loadPage(0);
@@ -138,6 +148,12 @@ function checkSynthetic() {
 	if (recs.length !== 1 || recs[0][5] & FLAG_TILED || !near(recs[0], [1, 10, 170, 30, 190]))
 		fail("empty pattern cell: expected only the plain rectangle, got " + JSON.stringify(recs));
 
+	// Soft-mask definitions are neither recorded nor counted.
+	var masked = doc.loadPage(5).getGraphicsSummary(0);
+	recs = records(masked);
+	if (recs.length !== 1 || !near(recs[0], [1, 10, 170, 30, 190]) || recs[0][6] !== 0xff0000 || masked[3] !== 1)
+		fail("soft mask: expected one red fill record and 1 fill path seen, got " + JSON.stringify(recs) + " (fill paths seen " + masked[3] + ")");
+
 	// The tee must leave the structured text of the synthetic pages unchanged too.
 	for (var p = 0; p < doc.countPages(); p++) {
 		var pg = doc.loadPage(p);
@@ -146,13 +162,13 @@ function checkSynthetic() {
 				fail("synthetic page " + p + ": teed structured text differs with " + OPTION_SETS[k]);
 	}
 
-	print((failures ? "FAIL " : "ok   ") + "synthetic pages (image through the tee, tiling patterns)");
+	print((failures ? "FAIL " : "ok   ") + "synthetic pages (image through the tee, tiling patterns, soft mask)");
 	return failures;
 }
 
 var totalPages = 0, totalFailures = checkSynthetic(), tPlain = 0, tTee = 0, tSummary = 0;
 for (var f = 0; f < files.length; f++) {
-	var doc, failures = 0, pages = 0, records = 0, overflow = 0;
+	var doc, failures = 0, pages = 0, recordCount = 0, overflow = 0, incomplete = 0;
 	try {
 		doc = Document.openDocument(files[f]);
 	} catch (e) {
@@ -180,7 +196,7 @@ for (var f = 0; f < files.length; f++) {
 				if (tee[1]) {
 					var err = checkSummary(tee[1], bounds);
 					if (err) { failures++; print("BAD SUMMARY " + files[f] + " page " + p + ": " + err); }
-					records += tee[1][1]; overflow += tee[1][8];
+					recordCount += tee[1][1]; overflow += tee[1][8]; incomplete += tee[1][14];
 				}
 				var t3 = Date.now();
 				page.getGraphicsSummary(0);
@@ -191,7 +207,7 @@ for (var f = 0; f < files.length; f++) {
 	}
 	totalPages += pages;
 	totalFailures += failures;
-	print((failures ? "FAIL " : "ok   ") + files[f] + ": " + pages + " pages, " + records + " records, " + overflow + " overflowing pages");
+	print((failures ? "FAIL " : "ok   ") + files[f] + ": " + pages + " pages, " + recordCount + " records, " + overflow + " overflowing pages, " + incomplete + " incomplete");
 }
 print("pages " + totalPages + ", failures " + totalFailures);
 if (timing)
