@@ -38,11 +38,25 @@
 
 #include "mupdf/fitz.h"
 
+#include "color-imp.h"
+
 #include <string.h>
 
 #define GRID FZ_GRAPHICS_SUMMARY_GRID
 #define STRIDE FZ_GRAPHICS_SUMMARY_STRIDE
 #define HASH_PREFIX 4096
+#define MAX_CONVERTERS 8
+
+/* A colour converter to RGB, kept for the device's lifetime. Finding a
+ * converter can build an ICC link, which is expensive; the link is normally
+ * cached in the store, but a store that is full of in-use items (e.g. large
+ * images) cannot take it, and the link would be rebuilt for every path. */
+typedef struct
+{
+	fz_colorspace *cs;
+	fz_color_params params;
+	fz_color_converter cc;
+} rgb_converter;
 
 typedef struct
 {
@@ -62,6 +76,9 @@ typedef struct
 	int tile_depth; /* tile nesting depth */
 	int tile_mask; /* in_mask when the outermost tile began */
 	int tile_first; /* tile_rec holds the first primitive of the tile */
+	int converters; /* entries in use in converter */
+	int next_converter; /* entry to replace when all are in use */
+	rgb_converter converter[MAX_CONVERTERS];
 	fz_rect tile_area; /* device-space area painted by the outermost tile */
 	float tile_rec[STRIDE];
 	float grid[GRID * GRID];
@@ -89,14 +106,51 @@ static const fz_path_walker stats_walker = { stats_moveto, stats_lineto, stats_c
 
 /* Recording */
 
-static float
-pack_rgb(fz_context *ctx, fz_colorspace *cs, const float *color, fz_color_params params)
+static fz_color_converter *
+find_rgb_converter(fz_context *ctx, fz_graphics_summary_device *dev, fz_colorspace *cs, fz_color_params params)
 {
+	rgb_converter *entry;
+	int i;
+
+	for (i = 0; i < dev->converters; i++)
+	{
+		entry = &dev->converter[i];
+		if (entry->cs == cs && entry->params.ri == params.ri && entry->params.bp == params.bp &&
+			entry->params.op == params.op && entry->params.opm == params.opm)
+			return &entry->cc;
+	}
+
+	if (dev->converters < MAX_CONVERTERS)
+		entry = &dev->converter[dev->converters++];
+	else
+	{
+		/* Replace the entries in turn. */
+		entry = &dev->converter[dev->next_converter];
+		dev->next_converter = (dev->next_converter + 1) % MAX_CONVERTERS;
+		fz_drop_color_converter(ctx, &entry->cc);
+		fz_drop_colorspace(ctx, entry->cs);
+	}
+	/* An unfilled entry (if finding the converter throws) never matches
+	 * and is safe to drop. */
+	entry->cs = NULL;
+	memset(&entry->cc, 0, sizeof entry->cc);
+
+	fz_find_color_converter(ctx, &entry->cc, cs, fz_device_rgb(ctx), NULL, NULL, params);
+	entry->cs = fz_keep_colorspace(ctx, cs);
+	entry->params = params;
+	return &entry->cc;
+}
+
+static float
+pack_rgb(fz_context *ctx, fz_graphics_summary_device *dev, fz_colorspace *cs, const float *color, fz_color_params params)
+{
+	fz_color_converter *cc;
 	float rgb[3];
 	int r, g, b;
 	if (!cs || !color)
 		return 0;
-	fz_convert_color(ctx, cs, color, fz_device_rgb(ctx), rgb, NULL, params);
+	cc = find_rgb_converter(ctx, dev, cs, params);
+	cc->convert(ctx, cc, color, rgb);
 	r = fz_clampi((int)(rgb[0] * 255 + 0.5f), 0, 255);
 	g = fz_clampi((int)(rgb[1] * 255 + 0.5f), 0, 255);
 	b = fz_clampi((int)(rgb[2] * 255 + 0.5f), 0, 255);
@@ -221,7 +275,7 @@ record_path(fz_context *ctx, fz_graphics_summary_device *dev, const fz_path *pat
 			if (!stroke && even_odd)
 				flags |= FZ_GRAPHICS_SUMMARY_EVEN_ODD;
 			rec[5] = (float)flags;
-			rec[6] = pack_rgb(ctx, cs, color, params);
+			rec[6] = pack_rgb(ctx, dev, cs, color, params);
 			rec[7] = fz_clamp(alpha, 0, 1) * 255;
 			rec[8] = (float)stats.segments;
 			if (stroke)
@@ -243,7 +297,7 @@ record_image(fz_context *ctx, fz_graphics_summary_device *dev, fz_graphics_summa
 		if (rec)
 		{
 			if (kind == FZ_GRAPHICS_SUMMARY_IMAGE_MASK)
-				rec[6] = pack_rgb(ctx, cs, color, params);
+				rec[6] = pack_rgb(ctx, dev, cs, color, params);
 			rec[7] = fz_clamp(alpha, 0, 1) * 255;
 			rec[9] = (float)image->w;
 			rec[10] = (float)image->h;
@@ -581,7 +635,14 @@ gs_close_device(fz_context *ctx, fz_device *d)
 static void
 gs_drop_device(fz_context *ctx, fz_device *d)
 {
-	fz_free(ctx, GS(d)->records);
+	fz_graphics_summary_device *dev = GS(d);
+	int i;
+	for (i = 0; i < dev->converters; i++)
+	{
+		fz_drop_color_converter(ctx, &dev->converter[i].cc);
+		fz_drop_colorspace(ctx, dev->converter[i].cs);
+	}
+	fz_free(ctx, dev->records);
 }
 
 fz_device *

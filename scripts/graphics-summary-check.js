@@ -115,6 +115,18 @@ function checkSynthetic() {
 	});
 	var maskRes = doc.addObject({ ExtGState: { GS0: { SMask: { Type: "Mask", S: "Luminosity", G: maskForm } } } });
 	doc.insertPage(-1, doc.addPage([0, 0, 200, 200], 0, maskRes, "/GS0 gs 1 0 0 rg 10 10 20 20 re f"));
+	// Fills in more colorspaces than the device keeps colour converters for,
+	// then in the first ones again: each a Separation whose full tint is a
+	// distinct RGB colour.
+	var sepColors = [], sepSpaces = {}, sepContent = "", sepOrder = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 1, 11, 2];
+	for (var c = 0; c < 12; c++) {
+		sepColors.push([(c * 20 + 10) / 255, (250 - c * 20) / 255, (c * 7 + 3) / 255]);
+		sepSpaces["CS" + c] = doc.addObject(["Separation", "Spot" + c, "DeviceRGB",
+			{ FunctionType: 2, Domain: [0, 1], C0: [1, 1, 1], C1: sepColors[c], N: 1 }]);
+	}
+	for (var c = 0; c < sepOrder.length; c++)
+		sepContent += "/CS" + sepOrder[c] + " cs 1 scn " + (c * 10 + 5) + " 10 5 5 re f ";
+	doc.insertPage(-1, doc.addPage([0, 0, 200, 200], 0, doc.addObject({ ColorSpace: sepSpaces }), sepContent));
 
 	// Image: the same record from the standalone device and the tee under every option set.
 	var page = doc.loadPage(0);
@@ -154,6 +166,15 @@ function checkSynthetic() {
 	if (recs.length !== 1 || !near(recs[0], [1, 10, 170, 30, 190]) || recs[0][6] !== 0xff0000 || masked[3] !== 1)
 		fail("soft mask: expected one red fill record and 1 fill path seen, got " + JSON.stringify(recs) + " (fill paths seen " + masked[3] + ")");
 
+	// Every fill keeps its own colour however the converters were reused.
+	recs = records(doc.loadPage(6).getGraphicsSummary(0));
+	for (var c = 0; c < sepOrder.length; c++) {
+		var rgb = sepColors[sepOrder[c]];
+		var packed = (Math.round(rgb[0] * 255) << 16) | (Math.round(rgb[1] * 255) << 8) | Math.round(rgb[2] * 255);
+		if (recs.length !== sepOrder.length || recs[c][6] !== packed)
+			fail("separation colours: fill " + c + " should have colour " + packed + ", got " + JSON.stringify(recs[c]));
+	}
+
 	// The tee must leave the structured text of the synthetic pages unchanged too.
 	for (var p = 0; p < doc.countPages(); p++) {
 		var pg = doc.loadPage(p);
@@ -162,7 +183,7 @@ function checkSynthetic() {
 				fail("synthetic page " + p + ": teed structured text differs with " + OPTION_SETS[k]);
 	}
 
-	print((failures ? "FAIL " : "ok   ") + "synthetic pages (image through the tee, tiling patterns, soft mask)");
+	print((failures ? "FAIL " : "ok   ") + "synthetic pages (image through the tee, tiling patterns, soft mask, colorspaces)");
 	return failures;
 }
 

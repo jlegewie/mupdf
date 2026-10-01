@@ -387,6 +387,13 @@ records them in C instead (`include/mupdf/fitz/graphics-summary.h` documents the
   changes for structured text without `ignore-actualtext`: a broken image XObject now raises
   its load error, and an image drawn under an ExtGState soft mask runs the mask's content
   (which reaches the structured-text device, as it does for masked paths and text);
+- fill and stroke colours are converted to packed RGB with converters kept for the device's
+  lifetime (up to 8 colorspace/colour-parameter pairs, replaced in turn). The colours are
+  exactly what `fz_convert_color` gives; the difference is that a converter's ICC link is built
+  once per page instead of being looked up in the store per path. A store that is over its
+  limit with items it cannot evict (e.g. a 110 MB image on a page under the WASM build's
+  100 MB store) does not keep the link, so `fz_convert_color` rebuilt it for every path: one
+  single-page PDF took 4.9 s instead of 58 ms;
 - a recording error (out of memory, a failed colour conversion) stops recording for the rest of
   the page and drops the record it left half-filled; the header's *incomplete* flag (`[14]`)
   says so. An error in the passthrough device disables it for the rest of the page, as in plain
@@ -414,8 +421,9 @@ Exposed as WASM exports (`wasm_new_stext_page_with_graphics` + `wasm_take_graphi
 formed. It first checks pages it builds in memory: an image gives the same record standalone
 and through the tee under every option set (including `ignore-actualtext`), and tiling-pattern
 fills (a whole page, a region whose clip excludes the cell, a pattern nested in a cell) give one
-tiled record covering the painted area, and a soft-mask definition adds neither records nor
-"seen" counts. `make fork-regression-test` runs it over the regression
+tiled record covering the painted area, a soft-mask definition adds neither records nor
+"seen" counts, and fills in more colorspaces than the device keeps converters for each keep
+their own colour. `make fork-regression-test` runs it over the regression
 corpus. Verified on 4,151 pages of 400 production PDFs natively and 1,094 pages in the WASM
 build (identical text; adding the tee costs ≈ 0 ms mean and 0.9 ms p95 per page over the stext
 build).
