@@ -18,6 +18,7 @@ The `fork` branch is based on the upstream tag **1.27.2** and contains a small s
 | `source/fitz/known-glyph-outlines.c`, `source/fitz/symbol-encoding-table.h`, `source/fitz/stext-device.c`, `include/mupdf/fitz/font.h`, `include/mupdf/fitz/structured-text.h` | New `map-symbol-private-use` stext option (`FZ_STEXT_MAP_SYMBOL_PRIVATE_USE`): U+F020-U+F0FF from a Symbol-layout font is translated through the Adobe Symbol encoding |
 | `source/fitz/known-glyph-outlines.c`, `source/fitz/adobe-private-use-table.h`, `source/fitz/stext-device.c`, `include/mupdf/fitz/font.h`, `include/mupdf/fitz/structured-text.h` | New `use-glyph-name-for-garbage` stext option (`FZ_STEXT_USE_GLYPH_NAME_FOR_GARBAGE`): U+FFFD, control and Private Use values from embedded simple fonts are repaired from exact Adobe Glyph List glyph names |
 | `source/fitz/stext-device.c`, `include/mupdf/fitz/structured-text.h` | New `space-after-symbols` stext option (`FZ_STEXT_SPACE_AFTER_SYMBOLS`): word gaps after math, arrow, shape and dingbat symbols become spaces |
+| `source/fitz/graphics-summary.c`, `include/mupdf/fitz/graphics-summary.h`, `include/mupdf/fitz.h`, `platform/wasm/lib/mupdf.c`, `source/tools/murun.c`, `scripts/graphics-summary-check.js`, `scripts/run-fork-regression-tests.sh`, `platform/win32/libmupdf.vcxproj{,.filters}` | New graphics-summary device: a compact record of every filled/stroked path, image, image mask and shading on a page, optionally teed with the structured-text device so one page interpretation yields both; WASM exports and `mutool run` bindings |
 | `FORK.md` | This file |
 
 ## Why the glyph-name option exists
@@ -348,6 +349,84 @@ per-code preparation produced; extraction and rendering output are unchanged.
 Per-code advance widths (`t3widths`) are still loaded individually. The fix is
 refcount-safe: `fz_drop_font` drops all 256 `t3procs`/`t3lists` entries, and the
 shared buffers/display lists are released when their last reference goes.
+
+## Graphics summary device
+
+Layout analysis in the consumer (figure, table and rule detection) needs the page's drawing
+primitives: where images, filled shapes and strokes are, their size, colour and rough shape.
+Collecting them through a JS device costs a second interpretation of the page plus one JS
+callback per primitive, which is too slow to run on every page. The graphics-summary device
+records them in C instead (`include/mupdf/fitz/graphics-summary.h` documents the format):
+
+- one float record per fill path, stroke path, image, image mask and shading — kind, bbox
+  (clipped to the current clip and the page), flags (axis-aligned rectangle, has curves,
+  even-odd, clipped, tiled), RGB colour, alpha, segment count, stroke width, image size and a hash of
+  the compressed image data (to recognise a logo drawn on many pages);
+- soft-mask definitions are skipped (not visible graphics: their contents are neither recorded
+  nor counted in the header's "seen" totals); annotations are not included;
+- a tiling-pattern fill that the interpreter runs as a tile (`begin_tile`/`end_tile`: the cell
+  is drawn once, in pattern space, and the device repeats it) becomes one record flagged
+  *tiled* whose bbox is the painted area — the tile area mapped to device space, clipped —
+  and whose kind, colour and shape fields come from the first primitive the cell draws. The
+  cell's own primitives are not recorded, so a hatched bar or a dotted background is not
+  reduced to one small cell, nor lost when that cell lies outside the clip. A cell that draws
+  nothing gives no record, and patterns nested in a cell belong to the outer record. If the
+  passthrough reports the tile as cached, the cell still runs for the summary but is withheld
+  from the passthrough;
+- past `max_records` (default 4000) primitives only count in a 32×32 overflow grid, so dense
+  scatter plots stay bounded;
+- with a passthrough device it forwards every call unchanged first and records afterwards
+  inside its own error handler, so it cannot change or disable the passthrough's output. It
+  inherits the passthrough's device hints except `FZ_DONT_DECODE_IMAGES`: the structured-text
+  device sets that hint when it neither keeps images nor tracks ActualText bounds
+  (`ignore-actualtext` without `preserve-images`), and the PDF interpreter then skips image
+  XObjects entirely (`pdf_process_Do` passes no image, `pdf_show_image` returns), which would
+  drop every image from the summary. Loading an image only reads its compressed data — pixels
+  are decoded on demand, which neither device requests — and the structured-text device
+  ignores the extra image calls in that mode. What loading can still change is what it
+  changes for structured text without `ignore-actualtext`: a broken image XObject now raises
+  its load error, and an image drawn under an ExtGState soft mask runs the mask's content
+  (which reaches the structured-text device, as it does for masked paths and text);
+- fill and stroke colours are converted to packed RGB with converters kept for the device's
+  lifetime (up to 8 colorspace/colour-parameter pairs, replaced in turn). The colours are
+  exactly what `fz_convert_color` gives; the difference is that a converter's ICC link is built
+  once per page instead of being looked up in the store per path. A store that is over its
+  limit with items it cannot evict (e.g. a 110 MB image on a page under the WASM build's
+  100 MB store) does not keep the link, so `fz_convert_color` rebuilt it for every path: one
+  single-page PDF took 4.9 s instead of 58 ms;
+- a recording error (out of memory, a failed colour conversion) stops recording for the rest of
+  the page and drops the record it left half-filled; the header's *incomplete* flag (`[14]`)
+  says so. An error in the passthrough device disables it for the rest of the page, as in plain
+  extraction, and since the error passes through the summary device's call, disables that too.
+  Only errors the interpreter continues past (in PDF, syntax and try-later errors) get that far:
+  `fz_new_stext_page_with_graphics_summary` then still writes the summary recorded up to the
+  error, flagged incomplete, so a returned stext page always comes with a summary. Any other
+  error from the structured-text device (out of memory, format, argument, …) aborts the page and
+  the call throws, exactly as plain extraction does.
+
+`fz_new_stext_page_with_graphics_summary` builds the structured text exactly like
+`fz_new_stext_page_from_page` (same bounds, device and run call) with the summary device as a
+tee, so both come from one interpretation. `fz_new_graphics_summary_from_page` produces the
+summary alone.
+
+Exposed as WASM exports (`wasm_new_stext_page_with_graphics` + `wasm_take_graphics_summary`,
+`wasm_new_graphics_summary_from_page`), wrapped in `platform/wasm/lib/mupdf.ts` as
+`Page.toStructuredTextWithGraphics(options, maxRecords)` → `[StructuredText, Float32Array]` and
+`Page.getGraphicsSummary(maxRecords)` → `Float32Array`, and as `mutool run` bindings
+(`Page.toStructuredTextWithGraphics(options, maxRecords)` → `[stext, summary]`,
+`Page.getGraphicsSummary(maxRecords)`).
+
+`scripts/graphics-summary-check.js` asserts that the teed structured text is identical
+(`asJSON`) to plain `toStructuredText` for several option sets and that every summary is well
+formed. It first checks pages it builds in memory: an image gives the same record standalone
+and through the tee under every option set (including `ignore-actualtext`), and tiling-pattern
+fills (a whole page, a region whose clip excludes the cell, a pattern nested in a cell) give one
+tiled record covering the painted area, a soft-mask definition adds neither records nor
+"seen" counts, and fills in more colorspaces than the device keeps converters for each keep
+their own colour. `make fork-regression-test` runs it over the regression
+corpus. Verified on 4,151 pages of 400 production PDFs natively and 1,094 pages in the WASM
+build (identical text; adding the tee costs ≈ 0 ms mean and 0.9 ms p95 per page over the stext
+build).
 
 ## Building the WebAssembly module
 

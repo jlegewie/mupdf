@@ -1183,6 +1183,43 @@ fz_stext_page * wasm_new_stext_page_from_page(fz_page *page, char *option_string
 	return stext;
 }
 
+// Fork addition: graphics summary (see mupdf/fitz/graphics-summary.h).
+// wasm_new_stext_page_with_graphics builds the structured text exactly like
+// wasm_new_stext_page_from_page and, in the same pass over the page contents,
+// a graphics summary that the caller collects with wasm_take_graphics_summary
+// (ownership passes to the caller; drop it with wasm_drop_buffer). The summary
+// is always there when the structured text is returned. Page.toStructuredTextWithGraphics
+// and Page.getGraphicsSummary in mupdf.ts wrap these as Float32Arrays.
+static fz_buffer *pending_graphics_summary = NULL;
+
+EXPORT
+fz_stext_page * wasm_new_stext_page_with_graphics(fz_page *page, char *option_string, int max_records)
+{
+	fz_stext_page *stext = NULL;
+	fz_stext_options options;
+	fz_drop_buffer(ctx, pending_graphics_summary);
+	pending_graphics_summary = NULL;
+	TRY({
+		fz_parse_stext_options(ctx, &options, option_string);
+		stext = fz_new_stext_page_with_graphics_summary(ctx, page, &options, max_records, &pending_graphics_summary);
+	})
+	return stext;
+}
+
+EXPORT
+fz_buffer * wasm_take_graphics_summary(void)
+{
+	fz_buffer *buf = pending_graphics_summary;
+	pending_graphics_summary = NULL;
+	return buf;
+}
+
+EXPORT
+fz_buffer * wasm_new_graphics_summary_from_page(fz_page *page, int max_records)
+{
+	POINTER(fz_new_graphics_summary_from_page, page, max_records)
+}
+
 EXPORT
 fz_display_list * wasm_new_display_list_from_page(fz_page *page)
 {
